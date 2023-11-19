@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Contacts</string>
+    <string name="language" translatable="false">Español</string>
+    <string name="es" translatable="false">Español</string>
+    <string name="en" translatable="false">Inglés</string>
+    <!--Application Translatable Strings-->
+    <string name="greetings_message">Hola Mundo</string>
+</resources>

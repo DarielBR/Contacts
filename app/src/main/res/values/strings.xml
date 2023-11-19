@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Contacts</string>
+    <string name="language" translatable="false">English</string>
+    <string name="en" translatable="false">English</string>
+    <string name="es" translatable="false">Spanish</string>
+    <!--Application Translatable Strings-->
+    <string name="greetings_message">Hello World</string>
+</resources>
