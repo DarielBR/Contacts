@@ -8,11 +8,13 @@ import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(@ApplicationContext private val context: Context) {
@@ -80,15 +82,28 @@ class DatabaseRepository @Inject constructor(@ApplicationContext private val con
         }.await()
     }
 
+    suspend fun getPersonsWithContactsBySearchValue(searchValue: String): List<PersonWithContacts> =
+        runBlocking {
+            async {
+                contactsDao.getPersonsWithContactsBySearchValue(searchValue)
+            }.await()
+        }
+
     suspend fun getAllPersons(): List<Person> = runBlocking(Dispatchers.IO) {
         async {
             contactsDao.getAllPersons()
         }.await()
     }
 
-    suspend fun getPerson(personId: Long): Person = runBlocking(Dispatchers.IO) {
+     suspend fun getPerson(personId: Long): Person = runBlocking(Dispatchers.IO) {
         async {
             contactsDao.getPerson(personId)
+        }.await()
+    }
+
+    suspend fun getPersonByName(value: String) = runBlocking(Dispatchers.IO) {
+        async {
+            contactsDao.getPersonByName(value)
         }.await()
     }
 }

@@ -8,9 +8,12 @@ import androidx.room.PrimaryKey
 data class Person (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "person_id")
-    val personId: Long,
+    val personId: Long = 0,
     @ColumnInfo(name = "full_name")
     val personFullName: String?,
     @ColumnInfo(name = "contact_address")
     val personAddress: String?
-)
+){
+
+    constructor(personFullName: String?, personAddress: String?): this(0, "", "")
+}

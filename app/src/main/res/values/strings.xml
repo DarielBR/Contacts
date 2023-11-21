@@ -5,4 +5,12 @@
     <string name="es" translatable="false">Spanish</string>
     <!--Application Translatable Strings-->
     <string name="greetings_message">Hello World</string>
+    <string name="navigation_go_back">cancel</string>
+    <string name="ui_button_save">Save contact</string>
+    <string name="ui_value_mobile">mobile</string>
+    <string name="ui_value_fixed">fixed line</string>
+    <string name="ui_value_email">email</string>
+    <string name="ui_value_notes">notes</string>
+    <string name="ui_value_full_name">full name</string>
+    <string name="ui_value_address">address</string>
 </resources>

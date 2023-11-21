@@ -15,6 +15,7 @@ import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 interface ContactsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPerson(person: Person)
+    //suspend fun insertPerson(person: Person)
     @Insert
     suspend fun insertPersonAndContacts(person: Person, contacts: List<Contact>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -33,8 +34,13 @@ interface ContactsDao {
     @Transaction
     @Query("SELECT * FROM person WHERE person_id = :personId")
     suspend fun getPersonWithContacts(personId: Long): List<PersonWithContacts>
+    @Transaction
+    @Query("SELECT * FROM person, contact WHERE person.full_name LIKE :searchValue OR contact.contact_id LIKE :searchValue GROUP BY person.person_id ORDER BY person.full_name")
+    suspend fun getPersonsWithContactsBySearchValue(searchValue: String): List<PersonWithContacts>
     @Query("SELECT * FROM person GROUP BY person.person_id ORDER BY person.full_name")
     suspend fun getAllPersons(): List<Person>
     @Query("SELECT * FROM person WHERE person_id = :personId")
     suspend fun getPerson(personId: Long): Person
+    @Query("SELECT * FROM person WHERE person.full_name == :value")
+    suspend fun getPersonByName(value: String): Person
 }
