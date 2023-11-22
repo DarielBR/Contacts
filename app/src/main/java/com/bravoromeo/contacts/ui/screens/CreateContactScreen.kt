@@ -101,19 +101,5 @@ fun CreateContactScreen(
             viewModel = viewModel,
             type = ContactType.EMAIL
         )
-        val coroutineScope = rememberCoroutineScope()
-        var lazyItems by remember { mutableStateOf(emptyList<Person>()) }
-        LaunchedEffect(key1=true) {
-            viewModel?.getAllPersons()
-            lazyItems = viewModel?.getPersonsList() ?: emptyList()
-        }
-        LazyColumn(
-            modifier = modifier
-                .fillMaxWidth()
-        ){
-            items(lazyItems){item ->
-                Text(text=item.personFullName + " " + item.personId + " de " + item.personAddress)
-            }
-        }
     }
 }

@@ -30,14 +30,17 @@ import kotlin.random.Random
 @Composable
 fun PreviewPersonTag(){
     ContactsTheme {
-        PersonTag()
+        Column{
+            PersonTag()
+            SmallPersonTag()
+        }
     }
 }
 
 @Composable
 fun PersonTag(
     modifier: Modifier= Modifier,
-    viewModel: ContactsViewModel? = null
+    name: String = "John"
 ){
     Surface {
         val color = getRandomColor()
@@ -55,14 +58,52 @@ fun PersonTag(
                 modifier = modifier
                     .fillMaxSize()
             ){
-                val name=
-                    viewModel?.contactsState?.currentPerson?.personFullName?.uppercase() ?: "John"
-                val initial=name[0].toString()
+                var initial = "#"
+                if (name != ""){
+                    val nameUpper=name.uppercase()
+                    initial=nameUpper[0].toString()
+                }
                 Text(
                     text=initial,
                     color=MaterialTheme.colorScheme.surface,
                     textAlign=TextAlign.Center,
                     fontSize = 90.sp
+                )
+            }
+        }
+    }
+}
+@Composable
+fun SmallPersonTag(
+    modifier: Modifier= Modifier,
+    name: String = "John"
+){
+    Surface {
+        val color = getRandomColor()
+        Card(
+            shape = CircleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = color.copy(alpha = 0.8f)
+            ),
+            modifier = modifier
+                .size(50.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier
+                    .fillMaxSize()
+            ){
+                var initial = "#"
+                if (name != ""){
+                    val nameUpper=name.uppercase()
+                    initial=nameUpper[0].toString()
+                }
+                Text(
+                    text=initial,
+                    color=MaterialTheme.colorScheme.surface,
+                    textAlign=TextAlign.Center,
+                    fontSize = 30.sp
                 )
             }
         }

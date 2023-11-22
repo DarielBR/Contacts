@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.bravoromeo.contacts.ui.screens.ContactDetail
 import com.bravoromeo.contacts.ui.screens.CreateContactScreen
 import com.bravoromeo.contacts.ui.screens.MainScreen
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
@@ -27,7 +28,11 @@ fun AppNavigation(
             )
         }
         composable(AppScreens.ContactDetail.route){
-            //TODO
+            ContactDetail(
+                viewModel = viewModel,
+                navHostController = navHostController,
+                modifier = modifier
+            )
         }
         composable(AppScreens.ContactCreation.route){
             CreateContactScreen(

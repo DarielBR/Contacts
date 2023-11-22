@@ -1,5 +1,6 @@
 package com.bravoromeo.contacts.viewmodel
 
+import android.opengl.Visibility
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.bravoromeo.contacts.repositories.database.DatabaseRepository
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.viewmodel.models.ContactsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,11 +24,57 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
 
     init {
         clearSearchValue()
-        viewModelScope.async { getAllPersons() }
+        viewModelScope.launch {
+            setPersonList()
+            //getPersonsList()
+        }
     }
 
-    fun getPersonsList(): List<Person>{
+    fun getPersonsList(): List<PersonWithContacts>{
         return contactsState.personList.toList()
+    }
+    fun setPersonList(){
+        viewModelScope.launch {
+            val list = databaseRepository.getPersonsWithContacts()
+            contactsState = contactsState.copy(personList = list.toMutableList())
+        }
+    }
+    fun setCurrentPerson(personFullName: String){
+        var person = Person()
+        var personWithContacts = PersonWithContacts(Person(), emptyList())
+        viewModelScope.launch {
+            person = databaseRepository.getPersonByName(personFullName)
+        }
+        if (person.personId != 0.toLong()){
+            viewModelScope.launch {
+                personWithContacts=databaseRepository.getPersonWithContacts(personId=person.personId)
+            }
+        }
+        contactsState = contactsState.copy(currentPerson = personWithContacts)
+    }
+
+    fun setCurrentPerson(personId: Long){
+        val personsList = contactsState.personList
+        val person = personsList.find { it.person.personId == personId }
+        viewModelScope.launch {
+            contactsState = contactsState.copy(
+                currentPerson = person ?: PersonWithContacts(Person(), emptyList())
+            )
+        }
+    }
+
+    fun setFloatingButtonVisibility(visibility: Boolean){
+        viewModelScope.launch {
+            contactsState = contactsState.copy(
+                isFloatingButtonVisible = visibility
+            )
+        }
+    }
+
+    fun getFloatingButtonVisibility(): Boolean = contactsState.isFloatingButtonVisible
+
+    fun onSearchValueChange(newValue: String){
+        contactsState = contactsState.copy(searchValue = newValue)
     }
     fun clearSearchValue(){
         contactsState = contactsState.copy(searchValue = "")
@@ -121,11 +169,11 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
         databaseRepository.insertContact(contact)
     }
 
-     suspend fun getAllPersons(){
+     /*suspend fun getAllPersons(){
         var personsList = emptyList<Person>()
         viewModelScope.async {
             personsList = databaseRepository.getAllPersons()
         }.await()
         contactsState = contactsState.copy(personList = personsList.toMutableList())
-    }
+    }*/
 }

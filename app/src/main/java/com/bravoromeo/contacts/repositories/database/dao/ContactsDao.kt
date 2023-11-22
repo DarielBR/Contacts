@@ -33,7 +33,7 @@ interface ContactsDao {
     suspend fun getPersonsWithContacts(): List<PersonWithContacts>
     @Transaction
     @Query("SELECT * FROM person WHERE person_id = :personId")
-    suspend fun getPersonWithContacts(personId: Long): List<PersonWithContacts>
+    suspend fun getPersonWithContacts(personId: Long): PersonWithContacts
     @Transaction
     @Query("SELECT * FROM person, contact WHERE person.full_name LIKE :searchValue OR contact.contact_id LIKE :searchValue GROUP BY person.person_id ORDER BY person.full_name")
     suspend fun getPersonsWithContactsBySearchValue(searchValue: String): List<PersonWithContacts>

@@ -5,7 +5,7 @@ import androidx.room.Relation
 
 data class PersonWithContacts(
     @Embedded
-    val contact: Person,
+    val person: Person,
     @Relation(
         parentColumn = "person_id",
         entityColumn = "person_id"

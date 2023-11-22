@@ -76,7 +76,7 @@ class DatabaseRepository @Inject constructor(@ApplicationContext private val con
         }.await()
     }
 
-    suspend fun getPersonWithContacts(personId: Long): List<PersonWithContacts> = runBlocking(Dispatchers.IO) {
+    suspend fun getPersonWithContacts(personId: Long): PersonWithContacts = runBlocking(Dispatchers.IO) {
         async {
             contactsDao.getPersonWithContacts(personId)
         }.await()

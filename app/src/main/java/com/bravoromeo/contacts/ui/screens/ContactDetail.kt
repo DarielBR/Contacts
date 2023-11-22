@@ -1,7 +1,6 @@
 package com.bravoromeo.contacts.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.entities.Contact
+import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.composables.ContactElementDetail
 import com.bravoromeo.contacts.ui.composables.IntentButton
 import com.bravoromeo.contacts.ui.composables.NavBackButton
@@ -46,6 +47,10 @@ fun ContactDetail(
     viewModel: ContactsViewModel? = null,
     navHostController: NavHostController? = null
 ){
+    //TODO hay que cambiar la manera de ocultar el boton flotante!!!!!!!!!!!!!!!!!!!!
+    viewModel?.setFloatingButtonVisibility(false)
+    val currentPerson = viewModel?.contactsState?.currentPerson
+        ?: PersonWithContacts(Person(), emptyList())
     Surface(
         modifier = modifier
             .fillMaxSize()
@@ -62,7 +67,7 @@ fun ContactDetail(
                 modifier=modifier
                     .fillMaxWidth()
             ){
-                Column(){
+                Column{
                     NavBackButton { navHostController?.popBackStack() }
                 }
                 Column(){
@@ -86,7 +91,8 @@ fun ContactDetail(
                     ) {
                         PersonTag(
                             modifier=modifier,
-                            viewModel=viewModel
+                            name = currentPerson.person.personFullName
+                                ?: "John Doe"
                         )
                     }
                     Row(
@@ -96,7 +102,7 @@ fun ContactDetail(
                             .padding(start=50.dp, end=50.dp, top=20.dp)
                     ) {
                         Text(
-                            text=viewModel?.contactsState?.currentPerson?.personFullName
+                            text = currentPerson.person.personFullName
                                 ?: "John Doe",
                             color=MaterialTheme.colorScheme.onSurface,
                             fontSize = 30.sp
@@ -123,9 +129,7 @@ fun ContactDetail(
                                 .padding(16.dp)
                                 .fillMaxWidth()
                         ) {
-                            //val contactList: List<Contact> = emptyList()
-                            val contactList: List<Contact> = Lista
-
+                            val contactList = currentPerson.contacts
                             LazyColumn(){
                                 items(contactList){contact ->
                                     ContactElementDetail(
@@ -142,8 +146,8 @@ fun ContactDetail(
                             .fillMaxWidth()
                     ) {
                         ContactElementDetail(
-                            contact = viewModel?.contactsState?.currentPerson?.personAddress
-                                ?: "Cabesteros 11, Madrid",
+                            contact = currentPerson.person.personAddress
+                                ?: "John Doe",
                             type = "ADDRESS"
                         )
                     }
