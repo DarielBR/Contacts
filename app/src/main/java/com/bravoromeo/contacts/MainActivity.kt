@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bravoromeo.contacts.navigation.AppNavigation
 import com.bravoromeo.contacts.navigation.AppScreens
@@ -65,15 +67,23 @@ fun MainComposition(
     viewModel: ContactsViewModel? = null,
     navHostController: NavHostController? = null
 ){
-    viewModel?.setFloatingButtonVisibility(true)
+    var buttonVisibility by rememberSaveable { mutableStateOf(true) }
+    val navBackStackEntry by navHostController!!.currentBackStackEntryAsState()
+
+    when(navBackStackEntry?.destination?.route){
+        "main_screen" -> buttonVisibility = true
+        else -> buttonVisibility = false
+    }
+
     ContactsTheme {
         Scaffold(
             floatingActionButton = {
-                FloatingButton(
-                    navHostController=navHostController,
-                    modifier=modifier,
-                    visibility = viewModel?.getFloatingButtonVisibility() ?: true
-                )
+                if(buttonVisibility){
+                    FloatingButton(
+                        navHostController=navHostController,
+                        modifier=modifier
+                    )
+                }
             },
             floatingActionButtonPosition = FabPosition.End,
             modifier = modifier.fillMaxSize()
@@ -94,24 +104,20 @@ fun MainComposition(
 @Composable
 fun FloatingButton(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController? = null,
-    visibility: Boolean
+    navHostController: NavHostController? = null
 ){
-    if (visibility){
-        IconButton(
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            onClick={ navHostController?.navigate(AppScreens.ContactCreation.route) },
-            modifier =modifier
-                .clip(CircleShape)
-                .size(50.dp)
-        ) {
-            Icon(painter=painterResource(id=R.drawable.add), contentDescription="")
-        }
+    IconButton(
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        onClick={ navHostController?.navigate(AppScreens.ContactCreation.route) },
+        modifier =modifier
+            .clip(CircleShape)
+            .size(50.dp)
+    ) {
+        Icon(painter=painterResource(id=R.drawable.add), contentDescription="")
     }
-
 }
 
 @Preview(showBackground = true)

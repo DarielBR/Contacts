@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.composables.ContactField
 import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.ui.composables.NavBackButton
@@ -71,9 +72,13 @@ fun CreateContactScreen(
             Button(
                 onClick={
                     coroutineScope.launch{
-                        viewModel?.insertPersonAndContacts()
+                        val isNewCreation = viewModel?.contactsState?.isNewCreation ?: true
+                        if (isNewCreation) viewModel?.insertPersonAndContacts()
+                        else viewModel?.updatePersonWithContacts()
                         //viewModel?.insertPerson()
                         viewModel?.clearStateCreationFields()
+                        viewModel?.setCreationState(true)
+                        navHostController?.popBackStack()
                     }
                 },
                 modifier=modifier

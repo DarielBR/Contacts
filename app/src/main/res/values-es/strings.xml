@@ -14,4 +14,10 @@
     <string name="ui_value_notes">notas</string>
     <string name="ui_value_full_name">nombre</string>
     <string name="ui_value_address">dirección</string>
+    <string name="ui_delete">borrar</string>
+    <string name="ui_edit">editar</string>
+    <string name="ui_share">exportar</string>
+    <string name="ui_are_you_sure">¿Quiere usted eliminar este contacto?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
 </resources>

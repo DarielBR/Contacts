@@ -1,5 +1,6 @@
 package com.bravoromeo.contacts.viewmodel
 
+import android.R
 import android.opengl.Visibility
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,12 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
         contactsState = contactsState.copy(currentPerson = personWithContacts)
     }
 
+    fun setCreationState(newValue: Boolean){
+        viewModelScope.launch {
+            contactsState = contactsState.copy(isNewCreation = newValue)
+        }
+    }
+
     fun setCurrentPerson(personId: Long){
         val personsList = contactsState.personList
         val person = personsList.find { it.person.personId == personId }
@@ -62,16 +69,6 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
             )
         }
     }
-
-    fun setFloatingButtonVisibility(visibility: Boolean){
-        viewModelScope.launch {
-            contactsState = contactsState.copy(
-                isFloatingButtonVisible = visibility
-            )
-        }
-    }
-
-    fun getFloatingButtonVisibility(): Boolean = contactsState.isFloatingButtonVisible
 
     fun onSearchValueChange(newValue: String){
         contactsState = contactsState.copy(searchValue = newValue)
@@ -111,13 +108,21 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
             contactCreationEmailId = ""
         )
     }
-    fun insertPerson() {
+    /*fun insertPerson() {
         val person = Person(
             personId = 0,
             personFullName = contactsState.personCreationName,
             personAddress = contactsState.personCreationAddress
         )
         viewModelScope.launch { databaseRepository.insertPerson(person) }
+    }*/
+
+    suspend fun deletePerson(){
+        val person = contactsState.currentPerson.person
+        val contacts = contactsState.currentPerson.contacts
+        viewModelScope.launch {
+            databaseRepository.deletePerson(person = person, contacts = contacts)
+        }
     }
     suspend fun insertPersonAndContacts(){
         val person = Person(
@@ -143,7 +148,7 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
         if (contactsState.contactCreationFixedId != ""){
             val contact = Contact(
                 personId = personId,
-                contactId = contactsState.contactCreationMobileId,
+                contactId = contactsState.contactCreationFixedId,
                 contactType = ContactType.FIXED.name,
                 contactNotes = ""
             )
@@ -152,7 +157,7 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
         if (contactsState.contactCreationEmailId != ""){
             val contact = Contact(
                 personId = personId,
-                contactId = contactsState.contactCreationMobileId,
+                contactId = contactsState.contactCreationEmailId,
                 contactType = ContactType.EMAIL.name,
                 contactNotes = ""
             )
@@ -162,18 +167,65 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
             contactList.forEach { contact ->
                 databaseRepository.insertContact(contact)
             }
-            //databaseRepository.insertPersonAndContacts(person, contactList.toList())
         }
+    }
+
+    suspend fun updatePersonWithContacts(){
+        val person = Person(
+            personId = contactsState.currentPerson.person.personId,
+            personFullName = contactsState.personCreationName,
+            personAddress = contactsState.personCreationAddress
+        )
+        viewModelScope.async { databaseRepository.updatePerson(person) }.await()
+        val contactList = emptyList<Contact>().toMutableList()
+        if (contactsState.contactCreationMobileId != ""){
+            val contact = Contact(
+                personId = contactsState.currentPerson.person.personId,
+                contactId = contactsState.contactCreationMobileId,
+                contactType = ContactType.MOBILE.name,
+                contactNotes = ""
+            )
+            contactList.add(contact)
+        }
+        if (contactsState.contactCreationFixedId != ""){
+            val contact = Contact(
+                personId = contactsState.currentPerson.person.personId,
+                contactId = contactsState.contactCreationFixedId,
+                contactType = ContactType.FIXED.name,
+                contactNotes = ""
+            )
+            contactList.add(contact)
+        }
+        if (contactsState.contactCreationEmailId != ""){
+            val contact = Contact(
+                personId = contactsState.currentPerson.person.personId,
+                contactId = contactsState.contactCreationEmailId,
+                contactType = ContactType.EMAIL.name,
+                contactNotes = ""
+            )
+            contactList.add(contact)
+            viewModelScope.launch {
+                contactList.forEach { contact ->
+                    if (contactExist(contact))
+                        databaseRepository.updateContact(contact)
+                    else
+                        databaseRepository.insertContact(contact)
+                }
+            }
+        }
+    }
+
+    private fun contactExist(contact: Contact): Boolean{
+        var result = false
+        val contacts = contactsState.currentPerson.contacts
+        contacts.forEach { personContact ->
+            if (personContact.contactType == contact.contactType) {
+                result = true
+            }
+        }
+        return result
     }
     fun insertContact(contact: Contact) = viewModelScope.launch {
         databaseRepository.insertContact(contact)
     }
-
-     /*suspend fun getAllPersons(){
-        var personsList = emptyList<Person>()
-        viewModelScope.async {
-            personsList = databaseRepository.getAllPersons()
-        }.await()
-        contactsState = contactsState.copy(personList = personsList.toMutableList())
-    }*/
 }

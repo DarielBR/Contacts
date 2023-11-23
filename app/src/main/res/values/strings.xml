@@ -13,4 +13,10 @@
     <string name="ui_value_notes">notes</string>
     <string name="ui_value_full_name">full name</string>
     <string name="ui_value_address">address</string>
+    <string name="ui_delete">delete</string>
+    <string name="ui_edit">edit</string>
+    <string name="ui_share">export</string>
+    <string name="ui_are_you_sure">Do you want to eliminate this contact?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

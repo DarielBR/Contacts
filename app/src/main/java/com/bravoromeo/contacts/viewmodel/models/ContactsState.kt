@@ -20,5 +20,5 @@ data class ContactsState (
     val contactCreationMobileId: String =  "",
     val contactCreationFixedId: String =  "",
     val contactCreationEmailId: String =  "",
-    val isFloatingButtonVisible: Boolean = true
+    val isNewCreation: Boolean = true
 )
