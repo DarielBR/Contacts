@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -28,16 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.navigation.AppScreens
-import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.composables.ContactMenuButton
-import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.ui.composables.GeneralSearchBar
-import com.bravoromeo.contacts.ui.composables.NavBackButton
 import com.bravoromeo.contacts.ui.composables.PersonElementDetail
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
@@ -113,16 +108,4 @@ fun MainScreen(
             }
         }
     }
-}
-
-@Composable
-private fun calculateScrollIndicatorPosition(scrollState: LazyListState): Float {
-    val totalItemsHeight = scrollState.layoutInfo.viewportEndOffset
-    val scrollFraction = if (totalItemsHeight > 0) {
-        scrollState.firstVisibleItemIndex.toFloat() / totalItemsHeight
-    } else {
-        0f
-    }
-
-    return scrollFraction * totalItemsHeight
 }

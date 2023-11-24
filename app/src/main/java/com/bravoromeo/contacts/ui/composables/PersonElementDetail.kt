@@ -14,9 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.bravoromeo.contacts.navigation.AppScreens
-import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
@@ -27,7 +24,7 @@ import com.bravoromeo.contacts.viewmodel.ContactsViewModel
 fun PreviewPersonElementDetail(){
     ContactsTheme {
         Surface {
-            PersonElementDetail(){}
+            PersonElementDetail{}
         }
     }
 }

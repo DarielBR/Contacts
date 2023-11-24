@@ -20,7 +20,7 @@ import com.bravoromeo.contacts.ui.theme.ContactsTheme
 @Composable
 fun PreviewIntentButton(){
     ContactsTheme {
-        IntentButton(){}
+        IntentButton{}
     }
 }
 

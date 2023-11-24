@@ -13,7 +13,7 @@ import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.repositories.intents.IntentsRepository
-import com.bravoromeo.contacts.repositories.jsonparse.repository.JsonParsingRepository
+import com.bravoromeo.contacts.repositories.jsonparse.JsonParsingRepository
 import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.viewmodel.models.ContactsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +47,7 @@ class ContactsViewModel @Inject constructor(
             contactsState = contactsState.copy(personList = list.toMutableList())
         }
     }
-    fun setCurrentPerson(personFullName: String){
+    /*fun setCurrentPerson(personFullName: String){
         var person = Person()
         var personWithContacts = PersonWithContacts(Person(), emptyList())
         viewModelScope.launch {
@@ -59,7 +59,7 @@ class ContactsViewModel @Inject constructor(
             }
         }
         contactsState = contactsState.copy(currentPerson = personWithContacts)
-    }
+    }*/
 
     fun setCreationState(newValue: Boolean){
         viewModelScope.launch {
@@ -250,12 +250,12 @@ class ContactsViewModel @Inject constructor(
         }
         return result
     }
-    fun insertContact(contact: Contact) = viewModelScope.launch {
+    /*fun insertContact(contact: Contact) = viewModelScope.launch {
         databaseRepository.insertContact(contact)
-    }
+    }*/
 
     fun getCurrentMobile(): String?{
-        var number: String? = null
+        var number: String?
         contactsState.currentPerson.contacts.forEach {contact ->
             if (contact.contactType == ContactType.MOBILE.name){
                 number = contact.contactId
@@ -266,7 +266,7 @@ class ContactsViewModel @Inject constructor(
     }
 
     fun getCurrentMail(): String?{
-        var mail: String? = null
+        var mail: String?
         contactsState.currentPerson.contacts.forEach {contact ->
             if (contact.contactType == ContactType.EMAIL.name){
                 mail = contact.contactId
@@ -324,9 +324,10 @@ class ContactsViewModel @Inject constructor(
     }
     suspend fun exportContacts(personWithContacts: PersonWithContacts){
         var success = false
-        setPersonList()
+        val personList = mutableListOf<PersonWithContacts>()
+        personList.add(personWithContacts)
         viewModelScope.async {
-            jsonRepository.writeContactsToJsonFile(contactsState.personList){isSuccessful ->
+            jsonRepository.writeContactsToJsonFile(personList){isSuccessful ->
                 success = isSuccessful
             }
         }.await()

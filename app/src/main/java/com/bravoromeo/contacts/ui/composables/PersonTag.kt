@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -20,9 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
-import com.bravoromeo.contacts.viewmodel.ContactsViewModel
 import kotlin.random.Random
 
 @Preview(showBackground = true)
@@ -122,7 +119,7 @@ data class UserIconColor(
 )
 
 object listOfIconColors{
-    val colors = listOf<UserIconColor>(
+    val colors = listOf(
         UserIconColor(
             color = Color.Red.copy(alpha = 0.5f),
             id = 1

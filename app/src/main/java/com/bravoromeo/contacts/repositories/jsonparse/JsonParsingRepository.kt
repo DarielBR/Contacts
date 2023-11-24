@@ -1,16 +1,11 @@
-package com.bravoromeo.contacts.repositories.jsonparse.repository
+package com.bravoromeo.contacts.repositories.jsonparse
 
-import android.content.Context
 import android.os.Environment
-import android.widget.Toast
-import androidx.compose.ui.res.stringResource
-import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -18,9 +13,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import javax.inject.Inject
 
-class JsonParsingRepository @Inject constructor(
-    private val context: Context
-) {
+class JsonParsingRepository @Inject constructor() {
     suspend fun readContactsFromJson(
         onSuccess: (Boolean) -> Unit
     ): List<PersonWithContacts>{

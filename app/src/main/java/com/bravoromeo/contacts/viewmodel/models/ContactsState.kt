@@ -1,6 +1,5 @@
 package com.bravoromeo.contacts.viewmodel.models
 
-import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 
@@ -11,7 +10,7 @@ data class ContactsState (
             personFullName = "",
             personAddress = ""
         ),
-        contacts = emptyList<Contact>()
+        contacts = emptyList()
     ),
     val personList: MutableList<PersonWithContacts> = emptyList<PersonWithContacts>().toMutableList(),
     val searchValue: String = "",

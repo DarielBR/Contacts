@@ -11,7 +11,7 @@ class IntentsRepository @Inject constructor(
     fun callIntent(number: String){
         val callIntent = Intent(
             Intent.ACTION_DIAL,
-            Uri.parse("tel:" + number)
+            Uri.parse("tel:$number")
         )
         callIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(callIntent)
@@ -26,7 +26,7 @@ class IntentsRepository @Inject constructor(
     }
     fun sendMail(mail: String){
         val mailIntent = Intent(Intent.ACTION_SEND)
-        mailIntent.setType("text/html")
+        mailIntent.type="text/html"
         mailIntent.putExtra(Intent.EXTRA_EMAIL, mail)
 
         context.startActivity(Intent.createChooser(mailIntent, "").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))

@@ -11,10 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +26,7 @@ import com.bravoromeo.contacts.ui.theme.ContactsTheme
 @Composable
 fun PreviewMenuButtons(){
     ContactsTheme {
-        Surface{ ContactMenuButton(){} }
+        Surface{ ContactMenuButton{} }
     }
 }
 
@@ -42,7 +38,6 @@ fun ContactMenuButton(
     textResource: Int = R.string.ui_delete,
     onClick: () -> Unit
 ){
-    var openDialog by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
