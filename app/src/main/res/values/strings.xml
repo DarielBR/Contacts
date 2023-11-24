@@ -16,7 +16,15 @@
     <string name="ui_delete">delete</string>
     <string name="ui_edit">edit</string>
     <string name="ui_share">export</string>
+    <string name="ui_import">import</string>
     <string name="ui_are_you_sure">Do you want to eliminate this contact?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="permission_phone_granted">Phone permission granted</string>
+    <string name="permission_phome_rationale">Please, grant phone call permission for full functionality availability.</string>
+    <string name="permission_phone_denied">This app needs phone call permission to work with full capabilities, please, grant it in application settings.</string>
+    <string name="toast_error_writing_file">Error writing the contacts file into device.</string>
+    <string name="toast_success_writing_file">Contacts file saved into Downloads folder.</string>
+    <string name="toast_error_reading_file">Error importing contacts from file.</string>
+    <string name="toast_success_reading_file">Success importing contacts.</string>
 </resources>

@@ -17,7 +17,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class DatabaseRepository @Inject constructor(@ApplicationContext private val context: Context) {
+class DatabaseRepository @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val contactsDao: ContactsDao
 
     init {

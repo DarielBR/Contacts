@@ -1,16 +1,19 @@
 package com.bravoromeo.contacts.viewmodel
 
-import android.R
-import android.opengl.Visibility
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.DatabaseRepository
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
+import com.bravoromeo.contacts.repositories.intents.IntentsRepository
+import com.bravoromeo.contacts.repositories.jsonparse.repository.JsonParsingRepository
 import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.viewmodel.models.ContactsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +21,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
-class ContactsViewModel @Inject constructor(private val databaseRepository: DatabaseRepository)
-    : ViewModel() {
+class ContactsViewModel @Inject constructor(
+    private val databaseRepository: DatabaseRepository,
+    private val intentsRepository: IntentsRepository,
+    private val jsonRepository: JsonParsingRepository,
+    private val context: Context
+): ViewModel() {
     var contactsState by mutableStateOf(ContactsState())
             private set
 
@@ -169,6 +176,24 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
             }
         }
     }
+    suspend fun insertPersonAndContacts(personWithContacts: PersonWithContacts){
+        viewModelScope.async { databaseRepository.insertPerson(personWithContacts.person) }.await()
+        val personId = viewModelScope.async {
+            databaseRepository.getPerson(personWithContacts.person.personId)
+        }.await().personId
+        viewModelScope.launch {
+            personWithContacts.contacts.forEach { contact ->
+                val newContact = Contact(
+                    personId = personId,
+                    contactId = contact.contactId,
+                    contactType = contact.contactType,
+                    contactNotes = contact.contactNotes
+                )
+                databaseRepository.insertContact(newContact)
+            }
+        }
+    }
+
 
     suspend fun updatePersonWithContacts(){
         val person = Person(
@@ -227,5 +252,85 @@ class ContactsViewModel @Inject constructor(private val databaseRepository: Data
     }
     fun insertContact(contact: Contact) = viewModelScope.launch {
         databaseRepository.insertContact(contact)
+    }
+
+    fun getCurrentMobile(): String?{
+        var number: String? = null
+        contactsState.currentPerson.contacts.forEach {contact ->
+            if (contact.contactType == ContactType.MOBILE.name){
+                number = contact.contactId
+                return number
+            }
+        }
+        return null
+    }
+
+    fun getCurrentMail(): String?{
+        var mail: String? = null
+        contactsState.currentPerson.contacts.forEach {contact ->
+            if (contact.contactType == ContactType.EMAIL.name){
+                mail = contact.contactId
+                return mail
+            }
+        }
+        return null
+    }
+    fun dialUp(){
+        val number = getCurrentMobile()
+        if (number != null) { intentsRepository.callIntent(number) }
+    }
+
+    fun sendSMS(){
+        val number = getCurrentMobile()
+        number?.let { intentsRepository.sendSMS(number) }
+    }
+
+    fun sentMail(){
+        val mail = getCurrentMail()
+        mail?.let { intentsRepository.sendMail(mail) }
+    }
+
+    suspend fun importContacts(){
+        var success = false
+        setPersonList()
+        val importedList =
+            viewModelScope.async { jsonRepository.readContactsFromJson { isSuccessful ->
+                success = isSuccessful
+            } }.await()
+        if (success){
+            viewModelScope.async{
+                importedList.forEach { imported ->
+                    if (contactsState.personList.find { it.person.personId == imported.person.personId } == null) {
+                        insertPersonAndContacts(imported)
+                    }
+                }
+            }.await()
+            Toast.makeText(context, context.getString(R.string.toast_success_reading_file),Toast.LENGTH_LONG).show()
+        }else{
+            Toast.makeText(context, context.getString(R.string.toast_error_reading_file),Toast.LENGTH_LONG).show()
+        }
+    }
+
+    suspend fun exportContacts(){
+        var success = false
+        setPersonList()
+        viewModelScope.async {
+            jsonRepository.writeContactsToJsonFile(contactsState.personList){isSuccessful ->
+                success = isSuccessful
+            }
+        }.await()
+        if (success) Toast.makeText(context, context.getString(R.string.toast_success_writing_file),Toast.LENGTH_LONG).show()
+        else Toast.makeText(context, context.getString(R.string.toast_error_writing_file),Toast.LENGTH_LONG).show()
+    }
+    suspend fun exportContacts(personWithContacts: PersonWithContacts){
+        var success = false
+        setPersonList()
+        viewModelScope.async {
+            jsonRepository.writeContactsToJsonFile(contactsState.personList){isSuccessful ->
+                success = isSuccessful
+            }
+        }.await()
+        if (success) Toast.makeText(context, context.getString(R.string.toast_success_writing_file),Toast.LENGTH_LONG).show()
+        else Toast.makeText(context, context.getString(R.string.toast_error_writing_file),Toast.LENGTH_LONG).show()
     }
 }

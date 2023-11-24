@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.navigation.AppScreens
-import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.ui.composables.ContactElementDetail
@@ -44,7 +42,6 @@ import com.bravoromeo.contacts.ui.composables.PersonTag
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
 import kotlinx.coroutines.launch
-import java.lang.Appendable
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -84,11 +81,12 @@ fun ContactDetail(
                 Column{
                     NavBackButton { navHostController?.popBackStack() }
                 }
-                Column(){
+                Column{
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = modifier
                     ) {
+                        val coroutineScope = rememberCoroutineScope()
                         ContactMenuButton(
                             textResource = R.string.ui_delete,
                             iconResource = R.drawable.delete
@@ -110,6 +108,12 @@ fun ContactDetail(
                             }
                             viewModel?.setCreationState(false)
                             navHostController?.navigate(AppScreens.ContactCreation.route)
+                        }
+                        ContactMenuButton(
+                            iconResource = R.drawable.export_file,
+                            textResource = R.string.ui_share
+                        ) {
+                            coroutineScope.launch{ viewModel?.exportContacts(currentPerson) }
                         }
                     }
                 }
@@ -154,9 +158,12 @@ fun ContactDetail(
                             .fillMaxWidth()
                             .padding(start=50.dp, end=50.dp, top=20.dp)
                     ) {
-                        IntentButton() {}
-                        IntentButton(iconResource=R.drawable.sms) {}
-                        IntentButton(iconResource=R.drawable.email) {}
+                        if(viewModel?.getCurrentMobile() !=  null){
+                            IntentButton{viewModel.dialUp()}
+                            IntentButton(iconResource=R.drawable.sms) {viewModel.sendSMS()}
+                        }
+                        if (viewModel?.getCurrentMail() != null)
+                            IntentButton(iconResource=R.drawable.email) {viewModel.sentMail()}
                     }
                     Row(
                         modifier=modifier
@@ -170,7 +177,7 @@ fun ContactDetail(
                                 .fillMaxWidth()
                         ) {
                             val contactList = currentPerson.contacts
-                            LazyColumn(){
+                            LazyColumn{
                                 items(contactList){contact ->
                                     ContactElementDetail(
                                         contact = contact.contactId,

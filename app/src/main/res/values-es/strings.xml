@@ -17,7 +17,15 @@
     <string name="ui_delete">borrar</string>
     <string name="ui_edit">editar</string>
     <string name="ui_share">exportar</string>
+    <string name="ui_import">importar</string>
     <string name="ui_are_you_sure">¿Quiere usted eliminar este contacto?</string>
     <string name="yes">Si</string>
     <string name="no">No</string>
+    <string name="permission_phone_granted">Permiso para hacer llamadas otorgado</string>
+    <string name="permission_phome_rationale">Por favor, otorge el permiso para hrealizar llamadas para habilitar toda la funcionalidad de la aplicación.</string>
+    <string name="permission_phone_denied">Esta aplicación necesita del permiso para hacer llamadas para funcionar a plenitud, por favor, otorgue este permiso en la configuración de la aplicación.</string>
+    <string name="toast_error_writing_file">Error de escritura creando el archivo de contactos.</string>
+    <string name="toast_success_writing_file">Archivo de contactos guardado en la carpeta de Descarags.</string>
+    <string name="toast_error_reading_file">Error importando el archivo de contactos.</string>
+    <string name="toast_success_reading_file">Archivo de contactos importado.</string>
 </resources>

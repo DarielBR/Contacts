@@ -79,6 +79,12 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     //Navigation in Compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    //Permission request
+    implementation ("com.google.accompanist:accompanist-permissions:0.24.13-rc")
+    //Retrofit
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    //GSON
+    implementation ("com.google.code.gson:gson:2.9.0")
 }
 
 kapt{
