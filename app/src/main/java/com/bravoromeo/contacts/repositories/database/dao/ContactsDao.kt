@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.bravoromeo.contacts.repositories.database.entities.Appointment
+import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
@@ -15,7 +17,6 @@ import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 interface ContactsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPerson(person: Person)
-    //suspend fun insertPerson(person: Person)
     @Insert
     suspend fun insertPersonAndContacts(person: Person, contacts: List<Contact>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -43,4 +44,14 @@ interface ContactsDao {
     suspend fun getPerson(personId: Long): Person
     @Query("SELECT * FROM person WHERE person.full_name == :value")
     suspend fun getPersonByName(value: String): Person
+    //New dao methods for the schedule functionality
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAppointment(appointment: Appointment)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAppointmentWithPersons(appointment: Appointment, persons: List<Person>)
+    @Update
+    suspend fun updateAppointment(appointment: Appointment)
+    @Transaction
+    @Query("SELECT * FROM appointment")
+    suspend fun getAllAppointments(): List<AppointmentWithPersons>
 }
