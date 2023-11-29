@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.bravoromeo.contacts.repositories.database.dao.ContactsDao
 import com.bravoromeo.contacts.repositories.database.dbclass.ContactsDatabase
+import com.bravoromeo.contacts.repositories.database.entities.Appointment
+import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
@@ -106,6 +108,43 @@ class DatabaseRepository @Inject constructor(
     suspend fun getPersonByName(value: String) = runBlocking(Dispatchers.IO) {
         async {
             contactsDao.getPersonByName(value)
+        }.await()
+    }
+    //Methods for the Appointment Functionality
+    suspend fun insertAppointment(appointment: Appointment) = runBlocking(Dispatchers.IO) {
+        async {
+            contactsDao.insertAppointment(appointment)
+        }.await()
+    }
+
+    suspend fun insertAppointmentWithPerson(appointmentWithPersons: AppointmentWithPersons) =
+        runBlocking(Dispatchers.IO) {
+            async {
+                contactsDao.insertAppointmentWithPerson(appointmentWithPersons)
+            }.await()
+        }
+
+    suspend fun deleteAppointment(appointment: Appointment) = runBlocking(Dispatchers.IO) {
+        launch {
+            contactsDao.deleteAppointment(appointment)
+        }
+    }
+    suspend fun updateAppointment(appointment: Appointment) = runBlocking(Dispatchers.IO) {
+        async {
+            contactsDao.updateAppointment(appointment)
+        }.await()
+    }
+
+    suspend fun updateAppointmentWithPersons(appointmentWithPersons: AppointmentWithPersons) =
+        runBlocking(Dispatchers.IO) {
+            async {
+                contactsDao.updateAppointmentWithPersons(appointmentWithPersons)
+            }.await()
+        }
+
+    suspend fun getAllAppointments(): List<AppointmentWithPersons> = runBlocking(Dispatchers.IO) {
+        return@runBlocking async {
+            contactsDao.getAllAppointments()
         }.await()
     }
 }

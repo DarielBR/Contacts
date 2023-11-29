@@ -48,9 +48,13 @@ interface ContactsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAppointment(appointment: Appointment)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAppointmentWithPersons(appointment: Appointment, persons: List<Person>)
+    suspend fun insertAppointmentWithPerson(appointmentWithPersons: AppointmentWithPersons)
     @Update
     suspend fun updateAppointment(appointment: Appointment)
+    @Update
+    suspend fun updateAppointmentWithPersons(appointmentWithPersons: AppointmentWithPersons)
+    @Delete
+    suspend fun deleteAppointment(appointment: Appointment)
     @Transaction
     @Query("SELECT * FROM appointment")
     suspend fun getAllAppointments(): List<AppointmentWithPersons>

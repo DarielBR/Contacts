@@ -1,5 +1,6 @@
 package com.bravoromeo.contacts.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.getValue
@@ -7,8 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.DatabaseRepository
+import com.bravoromeo.contacts.repositories.database.entities.Appointment
+import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
@@ -19,7 +23,10 @@ import com.bravoromeo.contacts.viewmodel.models.ContactsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
+
+@SuppressLint("NewApi")
 @HiltViewModel
 class ContactsViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
@@ -34,7 +41,6 @@ class ContactsViewModel @Inject constructor(
         clearSearchValue()
         viewModelScope.launch {
             setPersonList()
-            //getPersonsList()
         }
     }
 
@@ -47,23 +53,24 @@ class ContactsViewModel @Inject constructor(
             contactsState = contactsState.copy(personList = list.toMutableList())
         }
     }
-    /*fun setCurrentPerson(personFullName: String){
-        var person = Person()
-        var personWithContacts = PersonWithContacts(Person(), emptyList())
+
+    fun addToAppointmentCreationPersons(person: Person){
         viewModelScope.launch {
-            person = databaseRepository.getPersonByName(personFullName)
+            val currentList = contactsState.appointmentCreationPersons.toMutableList()
+            currentList.add(person)
+            contactsState = contactsState.copy(appointmentCreationPersons = currentList.toList())
         }
-        if (person.personId != 0.toLong()){
-            viewModelScope.launch {
-                personWithContacts=databaseRepository.getPersonWithContacts(personId=person.personId)
-            }
-        }
-        contactsState = contactsState.copy(currentPerson = personWithContacts)
-    }*/
+    }
 
     fun setCreationState(newValue: Boolean){
         viewModelScope.launch {
             contactsState = contactsState.copy(isNewCreation = newValue)
+        }
+    }
+    
+    fun setAppointmentCreationState(newValue: Boolean){
+        viewModelScope.launch { 
+            contactsState = contactsState.copy(isNewAppointmentCreation = newValue)
         }
     }
 
@@ -106,23 +113,37 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
+    fun onAppointmentCreationNameChange(newValue: String){
+        contactsState = contactsState.copy(appointmentCreationName = newValue)
+    }
+
+    fun onAppointmentCreationStartChange(newValue: LocalDateTime){
+        contactsState = contactsState.copy(appointmentCreationStart = newValue)
+    }
+
+    fun onAppointmentCreationEndChange(newValue: LocalDateTime){
+        contactsState = contactsState.copy(appointmentCreationEnd = newValue)
+    }
+
+    fun onAppointmentCreationNoteChange(newValue: String){
+        contactsState = contactsState.copy(appointmentCreationNote = newValue)
+    }
+
     fun clearStateCreationFields(){
         contactsState = contactsState.copy(
             personCreationName = "",
             personCreationAddress = "",
             contactCreationMobileId = "",
             contactCreationFixedId = "",
-            contactCreationEmailId = ""
+            contactCreationEmailId = "",
+            
+            appointmentCreationName = "",
+            appointmentCreationStart = LocalDateTime.MIN,
+            appointmentCreationEnd = LocalDateTime.MIN,
+            appointmentCreationNote = "",
+            appointmentCreationPersons = emptyList()
         )
     }
-    /*fun insertPerson() {
-        val person = Person(
-            personId = 0,
-            personFullName = contactsState.personCreationName,
-            personAddress = contactsState.personCreationAddress
-        )
-        viewModelScope.launch { databaseRepository.insertPerson(person) }
-    }*/
 
     suspend fun deletePerson(){
         val person = contactsState.currentPerson.person
@@ -194,7 +215,6 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
-
     suspend fun updatePersonWithContacts(){
         val person = Person(
             personId = contactsState.currentPerson.person.personId,
@@ -250,9 +270,6 @@ class ContactsViewModel @Inject constructor(
         }
         return result
     }
-    /*fun insertContact(contact: Contact) = viewModelScope.launch {
-        databaseRepository.insertContact(contact)
-    }*/
 
     fun getCurrentMobile(): String?{
         var number: String?
@@ -333,5 +350,60 @@ class ContactsViewModel @Inject constructor(
         }.await()
         if (success) Toast.makeText(context, context.getString(R.string.toast_success_writing_file),Toast.LENGTH_LONG).show()
         else Toast.makeText(context, context.getString(R.string.toast_error_writing_file),Toast.LENGTH_LONG).show()
+    }
+
+    //Functionality for new Appointments module
+    suspend fun insertAppointment(){
+        val appointment = Appointment(
+            appointmentId = 0,
+            appointmentName = contactsState.appointmentCreationName,
+            dateStart = contactsState.appointmentCreationStart,
+            dateEnd = contactsState.appointmentCreationEnd,
+            appointmentNote = contactsState.appointmentCreationNote
+        )
+        viewModelScope.launch {
+            databaseRepository.insertAppointment(appointment)
+        }
+    }
+
+    suspend fun insertAppointmentWithPerson(){
+        val appointment = Appointment(
+            appointmentId = 0,
+            appointmentName = contactsState.appointmentCreationName,
+            dateStart = contactsState.appointmentCreationStart,
+            dateEnd = contactsState.appointmentCreationEnd,
+            appointmentNote = contactsState.appointmentCreationNote
+        )
+        val personsList = contactsState.appointmentCreationPersons
+
+        val appointmentWithPersons = AppointmentWithPersons(
+            appointment = appointment,
+            persons = personsList
+        )
+
+        viewModelScope.launch {
+            if (contactsState.isNewAppointmentCreation)
+                databaseRepository.insertAppointmentWithPerson(appointmentWithPersons)
+            else{
+                databaseRepository.updateAppointmentWithPersons(appointmentWithPersons)
+                setAppointmentCreationState(true)
+            }
+        }
+    }
+
+    suspend fun deleteAppointment(appointment: Appointment){
+        viewModelScope.launch {
+            databaseRepository.deleteAppointment(appointment)
+        }
+    }
+
+    suspend fun updateAppointment(appointment: Appointment){
+        viewModelScope.launch {
+            databaseRepository.updateAppointment(appointment)
+        }
+    }
+
+    suspend fun getAllAppointments(): List<AppointmentWithPersons>{
+        return viewModelScope.async { databaseRepository.getAllAppointments() }.await()
     }
 }
