@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import java.time.LocalDateTime
+import java.time.LocalTime
+
 @SuppressLint("NewApi")
 data class ContactsState (
     val currentPerson: PersonWithContacts = PersonWithContacts(
@@ -25,8 +27,10 @@ data class ContactsState (
 
     val appointmentCreationName: String = "",
     val appointmentCreationStart: LocalDateTime = LocalDateTime.MIN,
+    val appointmentCreationStartTime: LocalTime = LocalTime.MIN,
     val appointmentCreationEnd: LocalDateTime = LocalDateTime.MIN,
+    val appointmentCreationEndTime: LocalTime = LocalTime.MIN,
     val appointmentCreationNote: String = "",
-    val appointmentCreationPersons: List<Person> = emptyList(),
+    val appointmentCreationPersons: List<Long> = emptyList(),
     val isNewAppointmentCreation: Boolean = true
 )

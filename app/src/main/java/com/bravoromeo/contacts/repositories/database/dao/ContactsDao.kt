@@ -11,6 +11,7 @@ import com.bravoromeo.contacts.repositories.database.entities.Appointment
 import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonAppointmentCrossRef
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 
 @Dao
@@ -46,13 +47,13 @@ interface ContactsDao {
     suspend fun getPersonByName(value: String): Person
     //New dao methods for the schedule functionality
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAppointment(appointment: Appointment)
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAppointmentWithPerson(appointmentWithPersons: AppointmentWithPersons)
+    suspend fun insertAppointment(appointment: Appointment): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)//This will change a lot of things in the code
+    suspend fun insertAppointmentWithPerson(personAppointmentCrossRef: PersonAppointmentCrossRef)
     @Update
     suspend fun updateAppointment(appointment: Appointment)
     @Update
-    suspend fun updateAppointmentWithPersons(appointmentWithPersons: AppointmentWithPersons)
+    suspend fun updateAppointmentWithPersons(personAppointmentCrossRef: PersonAppointmentCrossRef)
     @Delete
     suspend fun deleteAppointment(appointment: Appointment)
     @Transaction

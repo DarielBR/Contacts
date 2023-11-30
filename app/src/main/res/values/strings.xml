@@ -27,4 +27,6 @@
     <string name="toast_success_writing_file">Contacts file saved into Downloads folder.</string>
     <string name="toast_error_reading_file">Error importing contacts from file.</string>
     <string name="toast_success_reading_file">Success importing contacts.</string>
+    <string name="ui_appointment_title">Title</string>
+    <string name="ui_date_time">Date and time</string>
 </resources>

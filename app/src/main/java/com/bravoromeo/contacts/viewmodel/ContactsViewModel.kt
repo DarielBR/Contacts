@@ -8,22 +8,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.repositories.database.DatabaseRepository
 import com.bravoromeo.contacts.repositories.database.entities.Appointment
 import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonAppointmentCrossRef
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import com.bravoromeo.contacts.repositories.intents.IntentsRepository
 import com.bravoromeo.contacts.repositories.jsonparse.JsonParsingRepository
 import com.bravoromeo.contacts.ui.composables.ContactType
 import com.bravoromeo.contacts.viewmodel.models.ContactsState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 @SuppressLint("NewApi")
@@ -54,10 +56,10 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
-    fun addToAppointmentCreationPersons(person: Person){
+    fun addToAppointmentCreationPersons(personId: Long){
         viewModelScope.launch {
             val currentList = contactsState.appointmentCreationPersons.toMutableList()
-            currentList.add(person)
+            currentList.add(personId)
             contactsState = contactsState.copy(appointmentCreationPersons = currentList.toList())
         }
     }
@@ -121,8 +123,16 @@ class ContactsViewModel @Inject constructor(
         contactsState = contactsState.copy(appointmentCreationStart = newValue)
     }
 
+    fun onAppointmentCreationStartTimeChange(newValue: LocalTime){
+        contactsState = contactsState.copy(appointmentCreationStartTime = newValue)
+    }
+
     fun onAppointmentCreationEndChange(newValue: LocalDateTime){
         contactsState = contactsState.copy(appointmentCreationEnd = newValue)
+    }
+
+    fun onAppointmentCreationEndTimeChange(newValue: LocalTime){
+        contactsState = contactsState.copy(appointmentCreationEndTime = newValue)
     }
 
     fun onAppointmentCreationNoteChange(newValue: String){
@@ -374,18 +384,18 @@ class ContactsViewModel @Inject constructor(
             dateEnd = contactsState.appointmentCreationEnd,
             appointmentNote = contactsState.appointmentCreationNote
         )
+        val appointmentId = viewModelScope.async(Dispatchers.IO) { databaseRepository.insertAppointment(appointment) }
+
         val personsList = contactsState.appointmentCreationPersons
-
-        val appointmentWithPersons = AppointmentWithPersons(
-            appointment = appointment,
-            persons = personsList
-        )
-
-        viewModelScope.launch {
+        personsList.forEach {personId ->
+            val appointmentCrossRef = PersonAppointmentCrossRef(
+                appointmentId = appointmentId.await(),
+                personId = personId
+            )
             if (contactsState.isNewAppointmentCreation)
-                databaseRepository.insertAppointmentWithPerson(appointmentWithPersons)
+                databaseRepository.insertAppointmentWithPerson(appointmentCrossRef)
             else{
-                databaseRepository.updateAppointmentWithPersons(appointmentWithPersons)
+                databaseRepository.updateAppointmentWithPersons(appointmentCrossRef)
                 setAppointmentCreationState(true)
             }
         }

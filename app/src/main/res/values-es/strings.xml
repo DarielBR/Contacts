@@ -28,4 +28,6 @@
     <string name="toast_success_writing_file">Archivo de contactos guardado en la carpeta de Descarags.</string>
     <string name="toast_error_reading_file">Error importando el archivo de contactos.</string>
     <string name="toast_success_reading_file">Archivo de contactos importado.</string>
+    <string name="ui_appointment_title">Título</string>
+    <string name="ui_date_time">Fecha y hora</string>
 </resources>

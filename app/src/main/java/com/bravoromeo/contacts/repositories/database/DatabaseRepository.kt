@@ -8,15 +8,13 @@ import com.bravoromeo.contacts.repositories.database.entities.Appointment
 import com.bravoromeo.contacts.repositories.database.entities.AppointmentWithPersons
 import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
+import com.bravoromeo.contacts.repositories.database.entities.PersonAppointmentCrossRef
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(
@@ -111,16 +109,16 @@ class DatabaseRepository @Inject constructor(
         }.await()
     }
     //Methods for the Appointment Functionality
-    suspend fun insertAppointment(appointment: Appointment) = runBlocking(Dispatchers.IO) {
-        async {
+    suspend fun insertAppointment(appointment: Appointment): Long = runBlocking(Dispatchers.IO) {
+       return@runBlocking async {
             contactsDao.insertAppointment(appointment)
         }.await()
     }
 
-    suspend fun insertAppointmentWithPerson(appointmentWithPersons: AppointmentWithPersons) =
+    suspend fun insertAppointmentWithPerson(personAppointmentCrossRef: PersonAppointmentCrossRef) =
         runBlocking(Dispatchers.IO) {
             async {
-                contactsDao.insertAppointmentWithPerson(appointmentWithPersons)
+                contactsDao.insertAppointmentWithPerson(personAppointmentCrossRef)
             }.await()
         }
 
@@ -135,10 +133,10 @@ class DatabaseRepository @Inject constructor(
         }.await()
     }
 
-    suspend fun updateAppointmentWithPersons(appointmentWithPersons: AppointmentWithPersons) =
+    suspend fun updateAppointmentWithPersons(personAppointmentCrossRef: PersonAppointmentCrossRef) =
         runBlocking(Dispatchers.IO) {
             async {
-                contactsDao.updateAppointmentWithPersons(appointmentWithPersons)
+                contactsDao.updateAppointmentWithPersons(personAppointmentCrossRef)
             }.await()
         }
 
