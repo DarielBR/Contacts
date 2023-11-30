@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -35,6 +37,7 @@ import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.ui.utils.DatePicker
 import com.bravoromeo.contacts.ui.utils.TimePicker
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
@@ -43,7 +46,7 @@ import com.bravoromeo.contacts.viewmodel.ContactsViewModel
 fun PreviewAppointmentCreationCard(){
     ContactsTheme {
         Surface {
-            AppointmentCreationCard()
+            AppointmentCreationCard(){}
         }
     }
 }
@@ -53,7 +56,8 @@ fun PreviewAppointmentCreationCard(){
 @Composable
 fun AppointmentCreationCard(
     modifier: Modifier = Modifier,
-    viewModel: ContactsViewModel? = null
+    viewModel: ContactsViewModel? = null,
+    onClickCancel: () -> Unit
 ){
     Column(
         verticalArrangement = Arrangement.Center,
@@ -75,7 +79,7 @@ fun AppointmentCreationCard(
             ) {
                 Column(
                     modifier=modifier
-                        .padding(top=12.dp, bottom=6.dp, start=8.dp, end=8.dp)
+                        .padding(top=12.dp, bottom=12.dp, start=8.dp, end=8.dp)
                         .fillMaxSize()
                 ) {
                     Row(
@@ -96,13 +100,13 @@ fun AppointmentCreationCard(
                                 unfocusedBorderColor=Color.Transparent,
                                 placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                             ),
-                            shape=MaterialTheme.shapes.medium,
+                            shape=MaterialTheme.shapes.small,
                             modifier=modifier
                                 .padding(4.dp)
                                 .fillMaxWidth()
                                 .shadow(
                                     elevation=3.dp,
-                                    shape=MaterialTheme.shapes.medium
+                                    shape=MaterialTheme.shapes.small
                                 )
                         )
                     }
@@ -127,7 +131,7 @@ fun AppointmentCreationCard(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier =modifier
-                                        .padding(start = 2.dp, top = 8.dp, bottom = 8.dp)
+                                        .padding(start=2.dp, top=8.dp, bottom=8.dp)
                                         .fillMaxWidth()
                                 ){
                                     Text(
@@ -174,6 +178,91 @@ fun AppointmentCreationCard(
                                             viewModel?.onAppointmentCreationStartTimeChange(it.toLocalTime())
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = modifier.fillMaxSize()
+                    ) {
+                        Column(
+                            modifier = modifier
+                                .fillMaxSize()
+                        ) {
+                            Row(
+                                modifier =modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
+                            ) {
+                                OutlinedTextField(
+                                    value="",
+                                    onValueChange={ viewModel?.onAppointmentCreationNoteChange(it) },
+                                    placeholder={
+                                        Text(
+                                            text=stringResource(id=R.string.ui_appointment_note)
+                                        )
+                                    },
+                                    singleLine = false,
+                                    colors=TextFieldDefaults.outlinedTextFieldColors(
+                                        containerColor=MaterialTheme.colorScheme.surface,
+                                        focusedBorderColor=Color.Transparent,
+                                        unfocusedBorderColor=Color.Transparent,
+                                        placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                    ),
+                                    shape=MaterialTheme.shapes.small,
+                                    modifier=modifier
+                                        .padding(top = 4.dp, start = 4.dp, end = 4.dp, bottom = 8.dp)
+                                        .fillMaxSize()
+                                        .shadow(
+                                            elevation=3.dp,
+                                            shape=MaterialTheme.shapes.small
+                                        )
+                                )
+                            }
+                            Row(
+                                modifier =modifier
+                                    .padding(start = 4.dp, end = 4.dp)
+                                    .weight(0.2f)
+                                    .fillMaxSize()
+                            ) {
+                                val coroutineScope = rememberCoroutineScope()
+                                androidx.compose.material3.Button(
+                                    shape = MaterialTheme.shapes.small,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiary
+                                    ),
+                                    onClick={
+                                        coroutineScope.launch{ viewModel?.insertAppointmentWithPerson() }
+                                    },
+                                    modifier =  modifier
+                                        .padding(end = 2.dp)
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text=stringResource(id=R.string.ui_button_cancel_appointment),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                }
+                                androidx.compose.material3.Button(
+                                    shape = MaterialTheme.shapes.small,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                    ),
+                                    onClick= onClickCancel,
+                                    modifier =  modifier
+                                        .padding(start = 2.dp)
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text=stringResource(id=R.string.ui_button_save_appointment),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
                                 }
                             }
                         }
