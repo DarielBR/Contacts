@@ -1,6 +1,8 @@
 package com.bravoromeo.contacts.repositories.database
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Room
 import com.bravoromeo.contacts.repositories.database.dao.ContactsDao
 import com.bravoromeo.contacts.repositories.database.dbclass.ContactsDatabase
@@ -15,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.time.LocalDate
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(
@@ -145,4 +148,12 @@ class DatabaseRepository @Inject constructor(
             contactsDao.getAllAppointments()
         }.await()
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAppointmentsByDate(date: LocalDate): List<Appointment> =
+        runBlocking(Dispatchers.IO) {
+            return@runBlocking async {
+                contactsDao.getAppointmentsByDate(date.atStartOfDay())
+            }.await()
+        }
 }

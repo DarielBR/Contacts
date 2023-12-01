@@ -24,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.inject.Inject
@@ -60,6 +61,14 @@ class ContactsViewModel @Inject constructor(
         viewModelScope.launch {
             val currentList = contactsState.appointmentCreationPersons.toMutableList()
             currentList.add(personId)
+            contactsState = contactsState.copy(appointmentCreationPersons = currentList.toList())
+        }
+    }
+
+    fun deleteFromAppointmentCreationPersons(personId: Long){
+        viewModelScope.launch {
+            val currentList = contactsState.appointmentCreationPersons.toMutableList()
+            currentList.remove(personId)
             contactsState = contactsState.copy(appointmentCreationPersons = currentList.toList())
         }
     }
@@ -270,6 +279,10 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
+    suspend fun getPerson(personId: Long): Person {
+        return viewModelScope.async { databaseRepository.getPerson(personId) }.await()
+    }
+
     private fun contactExist(contact: Contact): Boolean{
         var result = false
         val contacts = contactsState.currentPerson.contacts
@@ -415,5 +428,11 @@ class ContactsViewModel @Inject constructor(
 
     suspend fun getAllAppointments(): List<AppointmentWithPersons>{
         return viewModelScope.async { databaseRepository.getAllAppointments() }.await()
+    }
+
+    suspend fun getAppointmentsByDate(date: LocalDate): Int{
+        val appointmentsList: List<Appointment> =
+            viewModelScope.async { databaseRepository.getAppointmentsByDate(date) }.await()
+        return appointmentsList.size
     }
 }

@@ -13,6 +13,7 @@ import com.bravoromeo.contacts.repositories.database.entities.Contact
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonAppointmentCrossRef
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
+import java.time.LocalDateTime
 
 @Dao
 interface ContactsDao {
@@ -59,4 +60,6 @@ interface ContactsDao {
     @Transaction
     @Query("SELECT * FROM appointment")
     suspend fun getAllAppointments(): List<AppointmentWithPersons>
+    @Query("SELECT * FROM appointment WHERE date_start == :date")
+    suspend fun getAppointmentsByDate(date: LocalDateTime): List<Appointment>
 }

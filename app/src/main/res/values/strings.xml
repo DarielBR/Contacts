@@ -32,4 +32,7 @@
     <string name="ui_button_save_appointment">Save Appointment</string>
     <string name="ui_button_cancel_appointment">Cancel</string>
     <string name="ui_date_time">Date and time</string>
+    <string name="unknown">unknown</string>
+    <string name="ui_previous_month">Previous Month</string>
+    <string name="ui_next_month">Next Month</string>
 </resources>
