@@ -30,6 +30,8 @@
     <string name="ui_appointment_title">Title</string>
     <string name="ui_appointment_note">Notes</string>
     <string name="ui_button_save_appointment">Save Appointment</string>
+    <string name="ui_add_appointment">Add appointment</string>
+    <string name="ui_today">Today</string>
     <string name="ui_button_cancel_appointment">Cancel</string>
     <string name="ui_date_time">Date and time</string>
     <string name="unknown">unknown</string>

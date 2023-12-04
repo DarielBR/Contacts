@@ -31,6 +31,8 @@
     <string name="ui_appointment_title">Título</string>
     <string name="ui_appointment_note">Notas</string>
     <string name="ui_button_save_appointment">Guardar Cita</string>
+    <string name="ui_add_appointment">Agregar cita</string>
+    <string name="ui_today">Hoy</string>
     <string name="ui_button_cancel_appointment">Cancelar</string>
     <string name="ui_date_time">Fecha y hora</string>
     <string name="unknown">desconocido</string>

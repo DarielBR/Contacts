@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,8 +56,8 @@ fun PreviewCalendarView(){
         CalendarViewScreen()
         Column{
             //Box(modifier=Modifier.size(50.dp)) { DayCard{} }
-            //Box(modifier=Modifier.size(50.dp)) { DayCard(appointmentCount = 2, dayOfMonth = 7, onSelectedMonth = false) {} }
-            //Box(modifier=Modifier.size(50.dp)) { DayCard(appointmentCount = 1, dayOfMonth = 14, isToday = true) {} }
+            //Box(modifier=Modifier.size(50.dp)) { DayCard(onSelectedMonth = false) {} }
+            //Box(modifier=Modifier.size(50.dp)) { DayCard(isToday = true) {} }
         }
     }
 }
@@ -251,6 +255,70 @@ fun CalendarViewScreen(
             }
         }
     }
+    Box(
+        contentAlignment = Alignment.BottomEnd,
+        modifier =modifier
+            .fillMaxSize()
+            .padding(bottom=8.dp, end=8.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = modifier
+                .fillMaxWidth()
+        ) {
+            Button(
+                shape = MaterialTheme.shapes.small,
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp,
+                    focusedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 2.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                onClick={ selectedDate = LocalDate.now() },
+                modifier =modifier
+                    .padding(end=2.dp)
+                    .height(60.dp)
+            ) {
+                Text(
+                    text=stringResource(id=R.string.ui_today),
+                    color=MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            Button(
+                shape = MaterialTheme.shapes.small,
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp,
+                    focusedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 2.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                onClick={ /*TODO*/ },
+                modifier =modifier
+                    .padding(start=4.dp)
+                    .size(60.dp)
+                    //.clip(MaterialTheme.shapes.small)
+                    //.shadow(
+                    //    elevation=1.dp,
+                    //    shape=MaterialTheme.shapes.small,
+                    //)
+            ) {
+                Icon(
+                    imageVector=Icons.Default.Add,
+                    contentDescription=stringResource(id=R.string.ui_add_appointment),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -265,7 +333,7 @@ fun DayCard(
 ){
     val coroutineScope = rememberCoroutineScope()
     var appointmentCount = 0
-    coroutineScope.launch { appointmentCount = viewModel?.getAppointmentsByDate(day) ?: 0 }
+    coroutineScope.launch { appointmentCount = viewModel?.getAppointmentsCountByDate(day) ?: 0 }
     Surface(
         shape = MaterialTheme.shapes.small,
         shadowElevation = if(onSelectedMonth) 1.dp else 0.dp,
@@ -278,6 +346,22 @@ fun DayCard(
             .fillMaxSize()
     )
     {
+        if (isToday){
+            Box(
+                contentAlignment=Alignment.TopEnd,
+                modifier=modifier
+                    .padding(top=2.dp, end=2.dp)
+            ) {
+                Surface(
+                    shape=CircleShape,
+                    color=if (onSelectedMonth) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.primary.copy(alpha=0.5f),
+                    modifier=modifier
+                        .padding(top=2.dp, end=2.dp)
+                        .size(10.dp)
+                ) {}
+            }
+        }
         Column(
             modifier =modifier
                 .padding(1.dp)
@@ -296,16 +380,6 @@ fun DayCard(
                     modifier = modifier
                         .padding(start = 2.dp)
                 )
-                if (isToday){
-                    Surface(
-                        shape=CircleShape,
-                        color=if (onSelectedMonth) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.primary.copy(alpha=0.5f),
-                        modifier=modifier
-                            .padding(top=2.dp, end=2.dp)
-                            .size(10.dp)
-                    ) {}
-                }
             }
             Row(
                 modifier =modifier

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.bravoromeo.contacts.repositories.database.entities.utils.DateTimeConverter
 import java.time.LocalDateTime
 @SuppressLint("NewApi")
 @Entity(tableName = "appointment")

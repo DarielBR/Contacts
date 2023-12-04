@@ -3,7 +3,7 @@ package com.bravoromeo.contacts.viewmodel.models
 import android.annotation.SuppressLint
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.LocalTime
 
 @SuppressLint("NewApi")
@@ -26,9 +26,9 @@ data class ContactsState (
     val isNewCreation: Boolean = true,
 
     val appointmentCreationName: String = "",
-    val appointmentCreationStart: LocalDateTime = LocalDateTime.MIN,
+    val appointmentCreationStart: LocalDate= LocalDate.MIN,
     val appointmentCreationStartTime: LocalTime = LocalTime.MIN,
-    val appointmentCreationEnd: LocalDateTime = LocalDateTime.MIN,
+    val appointmentCreationEnd: LocalDate = LocalDate.MIN,
     val appointmentCreationEndTime: LocalTime = LocalTime.MIN,
     val appointmentCreationNote: String = "",
     val appointmentCreationPersons: List<Long> = emptyList(),

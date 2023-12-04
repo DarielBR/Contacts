@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -128,7 +127,7 @@ class ContactsViewModel @Inject constructor(
         contactsState = contactsState.copy(appointmentCreationName = newValue)
     }
 
-    fun onAppointmentCreationStartChange(newValue: LocalDateTime){
+    fun onAppointmentCreationStartChange(newValue: LocalDate){
         contactsState = contactsState.copy(appointmentCreationStart = newValue)
     }
 
@@ -136,7 +135,7 @@ class ContactsViewModel @Inject constructor(
         contactsState = contactsState.copy(appointmentCreationStartTime = newValue)
     }
 
-    fun onAppointmentCreationEndChange(newValue: LocalDateTime){
+    fun onAppointmentCreationEndChange(newValue: LocalDate){
         contactsState = contactsState.copy(appointmentCreationEnd = newValue)
     }
 
@@ -157,8 +156,8 @@ class ContactsViewModel @Inject constructor(
             contactCreationEmailId = "",
             
             appointmentCreationName = "",
-            appointmentCreationStart = LocalDateTime.MIN,
-            appointmentCreationEnd = LocalDateTime.MIN,
+            appointmentCreationStart = LocalDate.MIN,
+            appointmentCreationEnd = LocalDate.MIN,
             appointmentCreationNote = "",
             appointmentCreationPersons = emptyList()
         )
@@ -380,8 +379,8 @@ class ContactsViewModel @Inject constructor(
         val appointment = Appointment(
             appointmentId = 0,
             appointmentName = contactsState.appointmentCreationName,
-            dateStart = contactsState.appointmentCreationStart,
-            dateEnd = contactsState.appointmentCreationEnd,
+            dateStart = contactsState.appointmentCreationStart.atTime(contactsState.appointmentCreationStartTime),
+            dateEnd = contactsState.appointmentCreationEnd.atTime(contactsState.appointmentCreationEndTime),
             appointmentNote = contactsState.appointmentCreationNote
         )
         viewModelScope.launch {
@@ -393,8 +392,8 @@ class ContactsViewModel @Inject constructor(
         val appointment = Appointment(
             appointmentId = 0,
             appointmentName = contactsState.appointmentCreationName,
-            dateStart = contactsState.appointmentCreationStart,
-            dateEnd = contactsState.appointmentCreationEnd,
+            dateStart = contactsState.appointmentCreationStart.atTime(contactsState.appointmentCreationStartTime),
+            dateEnd = contactsState.appointmentCreationEnd.atTime(contactsState.appointmentCreationEndTime),
             appointmentNote = contactsState.appointmentCreationNote
         )
         val appointmentId = viewModelScope.async(Dispatchers.IO) { databaseRepository.insertAppointment(appointment) }
@@ -430,7 +429,12 @@ class ContactsViewModel @Inject constructor(
         return viewModelScope.async { databaseRepository.getAllAppointments() }.await()
     }
 
-    suspend fun getAppointmentsByDate(date: LocalDate): Int{
+    suspend fun getAppointmentsByDate(date: LocalDate): List<Appointment>{
+        val appointmentsList: List<Appointment> =
+            viewModelScope.async { databaseRepository.getAppointmentsByDate(date) }.await()
+        return appointmentsList
+    }
+    suspend fun getAppointmentsCountByDate(date: LocalDate): Int{
         val appointmentsList: List<Appointment> =
             viewModelScope.async { databaseRepository.getAppointmentsByDate(date) }.await()
         return appointmentsList.size
