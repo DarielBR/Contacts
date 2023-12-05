@@ -87,7 +87,7 @@ fun AppointmentCreationCard(
                             .fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            value="",
+                            value=viewModel?.contactsState?.appointmentCreationName ?: "",
                             onValueChange={ viewModel?.onAppointmentCreationNameChange(it) },
                             placeholder={
                                 Text(
@@ -156,7 +156,7 @@ fun AppointmentCreationCard(
                                     }
                                     Column{
                                         TimePicker(context=context) {
-                                            viewModel?.onAppointmentCreationStartTimeChange(it.toLocalTime())
+                                            viewModel?.onAppointmentCreationStartTimeChange(it)
                                         }
                                     }
                                 }
@@ -170,12 +170,12 @@ fun AppointmentCreationCard(
                                     val context = LocalContext.current
                                     Column{
                                         DatePicker(context=context) {
-                                            viewModel?.onAppointmentCreationStartChange(it)
+                                            viewModel?.onAppointmentCreationEndChange(it)
                                         }
                                     }
                                     Column{
                                         TimePicker(context=context) {
-                                            viewModel?.onAppointmentCreationStartTimeChange(it.toLocalTime())
+                                            viewModel?.onAppointmentCreationEndTimeChange(it)
                                         }
                                     }
                                 }
@@ -195,7 +195,7 @@ fun AppointmentCreationCard(
                                     .fillMaxSize()
                             ) {
                                 OutlinedTextField(
-                                    value="",
+                                    value=viewModel?.contactsState?.appointmentCreationNote ?: "",
                                     onValueChange={ viewModel?.onAppointmentCreationNoteChange(it) },
                                     placeholder={
                                         Text(
@@ -231,9 +231,7 @@ fun AppointmentCreationCard(
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.tertiary
                                     ),
-                                    onClick={
-                                        coroutineScope.launch{ viewModel?.insertAppointmentWithPerson() }
-                                    },
+                                    onClick= onClickCancel,
                                     modifier =  modifier
                                         .padding(end = 2.dp)
                                         .weight(1f)
@@ -251,7 +249,10 @@ fun AppointmentCreationCard(
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primaryContainer
                                     ),
-                                    onClick= onClickCancel,
+                                    onClick= {
+                                        coroutineScope.launch{ viewModel?.insertAppointmentWithPerson() }
+                                        onClickCancel.invoke()
+                                    },
                                     modifier =  modifier
                                         .padding(start = 2.dp)
                                         .weight(1f)

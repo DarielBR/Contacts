@@ -3,8 +3,8 @@ package com.bravoromeo.contacts.ui.composables
 import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,18 +20,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.bravoromeo.contacts.navigation.AppScreens
 import com.bravoromeo.contacts.repositories.database.entities.Appointment
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
-import kotlinx.coroutines.launch
-import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -51,21 +56,26 @@ fun PreviewCalendarDayView(){
 fun CalendarDayView(
     modifier: Modifier = Modifier,
     viewModel: ContactsViewModel? = null,
-    currentDate: LocalDate = LocalDate.now()
+    navHostController: NavHostController? = null
 ){
+    val currentDate = viewModel?.contactsState?.currentDayDate ?: LocalDate.now()
+    var appointmentList: List<Appointment> by remember { mutableStateOf(emptyList()) }
+    LaunchedEffect(true){
+        appointmentList = viewModel!!.getAppointmentsByDate(currentDate)
+    }
     Surface(
-
         modifier =modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(top=8.dp, start=8.dp, end=8.dp, bottom=100.dp)
     ) {
         Column(
             modifier = modifier
+                //.padding(bottom = 80.dp)
                 .fillMaxSize()
         ) {
             Row(
                 modifier =modifier
-                    .weight(2f)
+                    .weight(1.4f)
                     .fillMaxSize()
             ) {
                 Surface(
@@ -116,27 +126,26 @@ fun CalendarDayView(
                                     .weight(8f)
                                     .fillMaxWidth()
                             ) {
-
-                            }
-                        }
-                        /*Divider(
-                            thickness = Dp.Hairline,
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        )*/
-                        val coroutineScope = rememberCoroutineScope()
-                        var appointmentList: List<Appointment> = emptyList()
-                        coroutineScope.launch {
-                            appointmentList = viewModel?.getAppointmentsByDate(currentDate) ?: emptyList()
-                        }
-                        appointmentList.forEach{appointment ->
-                            val appointmentDuration = Duration.between(appointment.dateStart, appointment.dateEnd)
-                            Box(
-                                modifier=modifier.fillMaxSize()
-                            ){
-                                AppointmentView(
-                                    startPadding=30,
-                                    topMultiplier=appointmentDuration.toHours()
-                                ) {/*TODO*/}
+                                val appointmentsInHour = appointmentList.filter {
+                                    it.dateStart.hour == hour
+                                }
+                                appointmentsInHour.forEach { appointment ->
+                                    AppointmentView(
+                                        modifier = Modifier,
+                                        appointment = appointment,
+                                        onClick = {appointment ->
+                                            viewModel?.setCurrentAppointment(appointment)
+                                            viewModel?.setAppointmentCreationState(false)
+                                            viewModel?.onAppointmentCreationNameChange(appointment.appointmentName)
+                                            viewModel?.onAppointmentCreationStartChange(appointment.dateStart.toLocalDate())
+                                            viewModel?.onAppointmentCreationStartTimeChange(appointment.dateStart.toLocalTime())
+                                            viewModel?.onAppointmentCreationEndChange(appointment.dateEnd.toLocalDate())
+                                            viewModel?.onAppointmentCreationEndTimeChange(appointment.dateEnd.toLocalTime())
+                                            viewModel?.onAppointmentCreationNoteChange(appointment.appointmentNote)
+                                            navHostController?.navigate(AppScreens.AppointmentCreationCard.route)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -150,15 +159,13 @@ fun CalendarDayView(
 @Composable
 fun AppointmentView(
     modifier: Modifier = Modifier,
-    appointment: Appointment? = null,
-    startPadding: Int = 0,//Must go
-    topMultiplier: Long = 1,
-    onClick: () -> Unit
+    appointment: Appointment = mockAppointment,
+    onClick: (Appointment) -> Unit
 
 ){
-    val hour = appointment?.dateStart?.hour ?: 0
-    val minutes =appointment?.dateStart?.minute ?: 0
-    val topPadding = 40 * (hour+minutes/60)
+    val hour = appointment.dateStart.hour
+    val minutes =appointment.dateStart.minute
+    val topPadding = 40 * (hour + minutes/60)
     Card(
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
@@ -169,11 +176,13 @@ fun AppointmentView(
         ),
         modifier =modifier
             .padding(
-                start=startPadding.dp,
-                top=topPadding.dp
+                start=4.dp,
+                top=2.dp,
+                end=4.dp,
+                bottom=2.dp
             )
             .fillMaxWidth()
-            .height((40 * topMultiplier).toFloat().dp)
+            .clickable { onClick.invoke(appointment) }
     ) {
         Text(
             text=appointment?.appointmentName ?: "Mock Appointment",
@@ -186,3 +195,11 @@ fun AppointmentView(
         )
     }
 }
+
+private val mockAppointment = Appointment(
+    appointmentId = 0,
+    appointmentName = "Mock Appointment",
+    dateStart = LocalDateTime.now(),
+    dateEnd = LocalDateTime.now(),//.plusHours(1),
+    appointmentNote = "This is a mock appointment"
+)

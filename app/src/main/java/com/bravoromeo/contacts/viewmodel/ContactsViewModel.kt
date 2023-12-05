@@ -94,6 +94,22 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentDayDate(newValue: LocalDate){
+        viewModelScope.launch{
+            contactsState = contactsState.copy(
+                currentDayDate = newValue
+            )
+        }
+    }
+
+    fun setCurrentAppointment(newValue: Appointment){
+        viewModelScope.launch{
+            contactsState = contactsState.copy(
+                currentAppointment = newValue
+            )
+        }
+    }
+
     fun onSearchValueChange(newValue: String){
         contactsState = contactsState.copy(searchValue = newValue)
     }
@@ -389,28 +405,35 @@ class ContactsViewModel @Inject constructor(
     }
 
     suspend fun insertAppointmentWithPerson(){
-        val appointment = Appointment(
+        var appointment = Appointment(
             appointmentId = 0,
             appointmentName = contactsState.appointmentCreationName,
             dateStart = contactsState.appointmentCreationStart.atTime(contactsState.appointmentCreationStartTime),
             dateEnd = contactsState.appointmentCreationEnd.atTime(contactsState.appointmentCreationEndTime),
             appointmentNote = contactsState.appointmentCreationNote
         )
-        val appointmentId = viewModelScope.async(Dispatchers.IO) { databaseRepository.insertAppointment(appointment) }
+        var appointmentId = 0.toLong()
+        if (contactsState.isNewAppointmentCreation)
+            appointmentId = viewModelScope.async(Dispatchers.IO) { databaseRepository.insertAppointment(appointment) }.await()
+        else{
+            appointmentId = contactsState.currentAppointment.appointmentId
+            appointment = appointment.copy(appointmentId = appointmentId)
+            viewModelScope.async(Dispatchers.IO) { databaseRepository.updateAppointment(appointment) }
+        }
 
         val personsList = contactsState.appointmentCreationPersons
         personsList.forEach {personId ->
             val appointmentCrossRef = PersonAppointmentCrossRef(
-                appointmentId = appointmentId.await(),
+                appointmentId = appointmentId,
                 personId = personId
             )
             if (contactsState.isNewAppointmentCreation)
                 databaseRepository.insertAppointmentWithPerson(appointmentCrossRef)
             else{
                 databaseRepository.updateAppointmentWithPersons(appointmentCrossRef)
-                setAppointmentCreationState(true)
             }
         }
+        setAppointmentCreationState(true)
     }
 
     suspend fun deleteAppointment(appointment: Appointment){

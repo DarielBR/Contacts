@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
 import com.bravoromeo.contacts.navigation.AppScreens
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
+import com.bravoromeo.contacts.ui.composables.CalendarViewScreen
 import com.bravoromeo.contacts.ui.composables.ContactMenuButton
 import com.bravoromeo.contacts.ui.composables.GeneralSearchBar
 import com.bravoromeo.contacts.ui.composables.PersonElementDetail
@@ -106,6 +107,39 @@ fun MainScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MainScreenPortrait(
+    modifier: Modifier = Modifier,
+    viewModel: ContactsViewModel? = null,
+    navHostController: NavHostController? = null
+){
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+    ){
+        Column(
+            modifier =modifier
+                .weight(1f)
+                .fillMaxSize()
+        ){
+            MainScreen(
+                viewModel = viewModel,
+                navHostController = navHostController
+            )
+        }
+        Column(
+            modifier =modifier
+                .weight(1f)
+                .fillMaxSize()
+        ) {
+            CalendarViewScreen(
+                viewModel = viewModel,
+                navHostController = navHostController
+            )
         }
     }
 }

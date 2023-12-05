@@ -1,6 +1,7 @@
 package com.bravoromeo.contacts.viewmodel.models
 
 import android.annotation.SuppressLint
+import com.bravoromeo.contacts.repositories.database.entities.Appointment
 import com.bravoromeo.contacts.repositories.database.entities.Person
 import com.bravoromeo.contacts.repositories.database.entities.PersonWithContacts
 import java.time.LocalDate
@@ -32,5 +33,8 @@ data class ContactsState (
     val appointmentCreationEndTime: LocalTime = LocalTime.MIN,
     val appointmentCreationNote: String = "",
     val appointmentCreationPersons: List<Long> = emptyList(),
-    val isNewAppointmentCreation: Boolean = true
+    val isNewAppointmentCreation: Boolean = true,
+
+    val currentDayDate: LocalDate = LocalDate.now(),
+    val currentAppointment: Appointment = Appointment()
 )

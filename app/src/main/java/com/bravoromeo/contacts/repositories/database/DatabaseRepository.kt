@@ -152,8 +152,10 @@ class DatabaseRepository @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getAppointmentsByDate(date: LocalDate): List<Appointment> =
         runBlocking(Dispatchers.IO) {
+            val startOfDay = date.atStartOfDay()
+            val startOfNextDay = date.plusDays(1).atStartOfDay()
             return@runBlocking async {
-                contactsDao.getAppointmentsByDate(date.atStartOfDay())
+                contactsDao.getAppointmentsByDate(startOfDay, startOfNextDay)
             }.await()
         }
 }

@@ -37,4 +37,6 @@
     <string name="unknown">unknown</string>
     <string name="ui_previous_month">Previous Month</string>
     <string name="ui_next_month">Next Month</string>
+    <string name="ui_contacts">Contacts</string>
+    <string name="ui_calendar">Calendar</string>
 </resources>

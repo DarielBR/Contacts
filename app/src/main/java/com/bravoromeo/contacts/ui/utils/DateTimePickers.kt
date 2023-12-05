@@ -19,7 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -30,7 +31,7 @@ fun DatePicker(
     modifier: Modifier = Modifier,
     context: Context? = null,
     color: Color = MaterialTheme.colorScheme.onSurface,
-    onPick: (LocalDateTime) -> Unit
+    onPick: (LocalDate) -> Unit
 ){
     val calendar = Calendar.getInstance()
     var pickedDate by remember { mutableStateOf(java.util.Calendar.getInstance()) }
@@ -42,6 +43,7 @@ fun DatePicker(
                 set(Calendar.MONTH, selectedMonth)
                 set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
             }
+            onPick.invoke(pickedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
         },
         calendar[Calendar.YEAR],
         calendar[Calendar.MONTH],
@@ -56,7 +58,6 @@ fun DatePicker(
             modifier=modifier
                 .clickable {
                     datePicker.show()
-                    onPick.invoke(pickedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 }
         )
     }
@@ -68,7 +69,7 @@ fun TimePicker(
     modifier: Modifier = Modifier,
     context: Context? = null,
     color: Color = MaterialTheme.colorScheme.onSurface,
-    onPick: (LocalDateTime) -> Unit
+    onPick: (LocalTime) -> Unit
 ){
     val calendar = Calendar.getInstance()
     var pickedTime by remember { mutableStateOf(java.util.Calendar.getInstance()) }
@@ -78,7 +79,10 @@ fun TimePicker(
             pickedTime = java.util.Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, selectedHour)
                 set(Calendar.MINUTE, selectedMinute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND,0)
             }
+            onPick.invoke(pickedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalTime())
         },
         calendar[Calendar.HOUR_OF_DAY],
         calendar[Calendar.MINUTE],
@@ -92,7 +96,6 @@ fun TimePicker(
             modifier=modifier
                 .clickable {
                     timePicker.show()
-                    onPick.invoke(pickedTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 }
         )
     }

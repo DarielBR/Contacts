@@ -60,6 +60,6 @@ interface ContactsDao {
     @Transaction
     @Query("SELECT * FROM appointment")
     suspend fun getAllAppointments(): List<AppointmentWithPersons>
-    @Query("SELECT * FROM appointment WHERE date_start == :date")//Review this Query, to include LocalTime
-    suspend fun getAppointmentsByDate(date: LocalDateTime): List<Appointment>
+    @Query("SELECT * FROM appointment WHERE date_start >= :startOfDay AND date_start < :startOfNextDay")//Review this Query, to include LocalTime
+    suspend fun getAppointmentsByDate(startOfDay: LocalDateTime, startOfNextDay: LocalDateTime): List<Appointment>
 }

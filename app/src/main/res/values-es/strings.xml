@@ -38,4 +38,6 @@
     <string name="unknown">desconocido</string>
     <string name="ui_previous_month">Mes anterior</string>
     <string name="ui_next_month">Mes próximo</string>
+    <string name="ui_contacts">Contactos</string>
+    <string name="ui_calendar">Calendario</string>
 </resources>

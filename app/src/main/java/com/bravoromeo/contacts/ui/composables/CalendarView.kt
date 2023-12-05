@@ -3,6 +3,7 @@ package com.bravoromeo.contacts.ui.composables
 import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,12 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.bravoromeo.contacts.R
+import com.bravoromeo.contacts.navigation.AppScreens
 import com.bravoromeo.contacts.ui.theme.ContactsTheme
 import com.bravoromeo.contacts.viewmodel.ContactsViewModel
-import kotlinx.coroutines.launch
 import java.text.DateFormatSymbols
 import java.time.LocalDate
 import java.time.Month
@@ -65,6 +68,8 @@ fun PreviewCalendarView(){
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarViewScreen(
+    viewModel: ContactsViewModel? = null,
+    navHostController: NavHostController? = null,
     modifier: Modifier = Modifier
 ){
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -76,7 +81,7 @@ fun CalendarViewScreen(
     ){
         Column(
             modifier=modifier
-                .padding(8.dp)
+                .padding(top=8.dp, start=8.dp, end=8.dp, bottom=75.dp)
                 .fillMaxSize()
         ) {
             Row(//Month navigation
@@ -156,9 +161,12 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
-                        ){}
+                        ){
+                        }
                     }
                 }
                 Column(//monday
@@ -171,6 +179,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -187,6 +197,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -202,6 +214,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -217,6 +231,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -232,6 +248,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -247,6 +265,8 @@ fun CalendarViewScreen(
                             day = calendarSheet[i],
                             isToday = calendarSheet[i] == LocalDate.now(),
                             onSelectedMonth = calendarSheet[i].month == selectedDate.month,
+                            viewModel = viewModel,
+                            navHostController = navHostController,
                             modifier = modifier
                                 .weight(1f)
                         ){}
@@ -259,7 +279,7 @@ fun CalendarViewScreen(
         contentAlignment = Alignment.BottomEnd,
         modifier =modifier
             .fillMaxSize()
-            .padding(bottom=8.dp, end=8.dp)
+            .padding(bottom=80.dp, end=8.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.End,
@@ -301,7 +321,9 @@ fun CalendarViewScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
-                onClick={ /*TODO*/ },
+                onClick={
+                    navHostController?.navigate(AppScreens.AppointmentCreationCard.route)
+                },
                 modifier =modifier
                     .padding(start=4.dp)
                     .size(60.dp)
@@ -329,11 +351,18 @@ fun DayCard(
     isToday: Boolean = false,
     onSelectedMonth: Boolean = true,
     viewModel: ContactsViewModel? = null,
-    onClick: () -> Unit
+    navHostController: NavHostController? = null,
+    onClick: (LocalDate) -> Unit
 ){
     val coroutineScope = rememberCoroutineScope()
-    var appointmentCount = 0
-    coroutineScope.launch { appointmentCount = viewModel?.getAppointmentsCountByDate(day) ?: 0 }
+    var appointmentCount by remember { mutableStateOf(0) }
+    /*coroutineScope.launch {
+        appointmentCount =viewModel?.getAppointmentsCountByDate(day)!! //?: 0
+    }*/
+    LaunchedEffect(key1=true) {
+        appointmentCount = viewModel!!.getAppointmentsCountByDate(day)
+    }
+
     Surface(
         shape = MaterialTheme.shapes.small,
         shadowElevation = if(onSelectedMonth) 1.dp else 0.dp,
@@ -342,8 +371,12 @@ fun DayCard(
             else MaterialTheme.colorScheme.surfaceVariant,
         modifier =modifier
             //.aspectRatio(1f)
-            .padding(1.dp)
+            .padding(top=1.dp)
             .fillMaxSize()
+            .clickable {
+                viewModel?.setCurrentDayDate(day)
+                navHostController?.navigate(AppScreens.CalendarDayView.route)
+            }
     )
     {
         if (isToday){
@@ -382,6 +415,8 @@ fun DayCard(
                 )
             }
             Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
                 modifier =modifier
                     .weight(0.60f)
                     .fillMaxSize()
@@ -399,6 +434,7 @@ fun DayCard(
                             verticalAlignment=Alignment.CenterVertically,
                             horizontalArrangement=Arrangement.End,
                             modifier=modifier
+                                .padding(end = 2.dp)
                                 .fillMaxSize()
                         ) {
                             Text(
@@ -406,6 +442,7 @@ fun DayCard(
                                 color=if (onSelectedMonth) MaterialTheme.colorScheme.onPrimaryContainer
                                 else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha=0.5f),
                                 fontWeight=FontWeight.SemiBold,
+                                textAlign = TextAlign.End,
                                 modifier=modifier
                                     .padding(end=2.dp)
                             )
