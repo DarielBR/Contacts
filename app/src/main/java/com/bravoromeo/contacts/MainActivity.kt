@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -102,21 +101,12 @@ fun MainComposition(
 
     ContactsTheme {
         Scaffold(
-            floatingActionButton = {
-                if(buttonVisibility){
-                    FloatingButton(
-                        navHostController=navHostController,
-                        modifier=modifier
-                    )
-                }
-            },
-            floatingActionButtonPosition = FabPosition.End,
             bottomBar = {
                 if (orientation == Configuration.ORIENTATION_PORTRAIT){
                     ContactsBottomBar(
                         navHostController=navHostController
                     )
-                }
+                }else null
             },
             modifier = modifier.fillMaxSize()
         ) {

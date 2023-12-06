@@ -70,6 +70,7 @@ fun PreviewCalendarView(){
 fun CalendarViewScreen(
     viewModel: ContactsViewModel? = null,
     navHostController: NavHostController? = null,
+    orientation: Int = Configuration.ORIENTATION_PORTRAIT,
     modifier: Modifier = Modifier
 ){
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -81,13 +82,21 @@ fun CalendarViewScreen(
     ){
         Column(
             modifier=modifier
-                .padding(top=8.dp, start=8.dp, end=8.dp, bottom=75.dp)
+                .padding(
+                    top = 8.dp,
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom =
+                    if (orientation == Configuration.ORIENTATION_PORTRAIT) 70.dp
+                    else 8.dp
+                )
                 .fillMaxSize()
         ) {
             Row(//Month navigation
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier =modifier
+                    .weight(1f)
                     .fillMaxWidth()
                     .padding(bottom=8.dp)
             ){
@@ -115,6 +124,7 @@ fun CalendarViewScreen(
             }
             Row(//Days of the week
                 modifier =modifier
+                    .weight(1f)
                     .fillMaxWidth()
                     .padding(vertical=8.dp)
             ) {
@@ -142,6 +152,7 @@ fun CalendarViewScreen(
             }
             Row(//calendar representation
                 modifier =modifier
+                    .weight(10f)
                     .fillMaxWidth()
                     .padding(vertical=8.dp)
             ) {
@@ -273,71 +284,61 @@ fun CalendarViewScreen(
                     }
                 }
             }
-        }
-    }
-    Box(
-        contentAlignment = Alignment.BottomEnd,
-        modifier =modifier
-            .fillMaxSize()
-            .padding(bottom=80.dp, end=8.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = modifier
-                .fillMaxWidth()
-        ) {
-            Button(
-                shape = MaterialTheme.shapes.small,
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp,
-                    focusedElevation = 2.dp,
-                    disabledElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    hoveredElevation = 2.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                onClick={ selectedDate = LocalDate.now() },
-                modifier =modifier
-                    .padding(end=2.dp)
-                    .height(60.dp)
+            Row(//Buttons
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
-                Text(
-                    text=stringResource(id=R.string.ui_today),
-                    color=MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            Button(
-                shape = MaterialTheme.shapes.small,
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp,
-                    focusedElevation = 2.dp,
-                    disabledElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    hoveredElevation = 2.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                onClick={
-                    navHostController?.navigate(AppScreens.AppointmentCreationCard.route)
-                },
-                modifier =modifier
-                    .padding(start=4.dp)
-                    .size(60.dp)
-                    //.clip(MaterialTheme.shapes.small)
-                    //.shadow(
-                    //    elevation=1.dp,
-                    //    shape=MaterialTheme.shapes.small,
-                    //)
-            ) {
-                Icon(
-                    imageVector=Icons.Default.Add,
-                    contentDescription=stringResource(id=R.string.ui_add_appointment),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+                Button(
+                    shape = MaterialTheme.shapes.small,
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        focusedElevation = 2.dp,
+                        disabledElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        hoveredElevation = 2.dp
+                    ),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    onClick={ selectedDate = LocalDate.now() },
+                    modifier =modifier
+                        .padding(end=2.dp)
+                        .height(60.dp)
+                ) {
+                    Text(
+                        text=stringResource(id=R.string.ui_today),
+                        color=MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                Button(
+                    shape = MaterialTheme.shapes.small,
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        focusedElevation = 2.dp,
+                        disabledElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        hoveredElevation = 2.dp
+                    ),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    onClick={
+                        navHostController?.navigate(AppScreens.AppointmentCreationCard.route)
+                    },
+                    modifier =modifier
+                        .padding(start=4.dp)
+                        .size(60.dp)
+                ) {
+                    Icon(
+                        imageVector=Icons.Default.Add,
+                        contentDescription=stringResource(id=R.string.ui_add_appointment),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
     }
@@ -434,7 +435,7 @@ fun DayCard(
                             verticalAlignment=Alignment.CenterVertically,
                             horizontalArrangement=Arrangement.End,
                             modifier=modifier
-                                .padding(end = 2.dp)
+                                .padding(end=2.dp)
                                 .fillMaxSize()
                         ) {
                             Text(

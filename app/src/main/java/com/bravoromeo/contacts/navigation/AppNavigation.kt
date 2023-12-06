@@ -37,14 +37,16 @@ fun AppNavigation(
             MainScreen(
                 modifier = modifier,
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                orientation = orientation
             )
         }
         composable(AppScreens.MainScreenLandscape.route){
             MainScreenPortrait(
                 modifier = modifier,
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                orientation = orientation
             )
         }
         composable(AppScreens.ContactDetail.route){
@@ -64,7 +66,8 @@ fun AppNavigation(
         composable(AppScreens.CalendarView.route){
             CalendarViewScreen(
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                orientation = orientation
             )
         }
         composable(AppScreens.AppointmentCreationCard.route){

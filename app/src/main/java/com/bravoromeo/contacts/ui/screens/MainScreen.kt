@@ -6,12 +6,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +29,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -49,7 +58,8 @@ fun PreviewMainScreen(){
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: ContactsViewModel? = null,
-    navHostController: NavHostController? = null
+    navHostController: NavHostController? = null,
+    orientation: Int = Configuration.ORIENTATION_PORTRAIT
 ){
     Surface(
         modifier = modifier.fillMaxSize()
@@ -58,16 +68,24 @@ fun MainScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start,
             modifier =modifier
-                .padding(8.dp)
+                .padding(
+                    top = 8.dp,
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom =
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 70.dp
+                        else 8.dp
+                )
                 .fillMaxSize()
         ) {
-            Spacer(modifier=modifier.height(28.dp))
+            Spacer(modifier=modifier.height(4.dp))
             GeneralSearchBar(viewModel = viewModel)
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier=modifier
-                    .fillMaxWidth()
+                    .weight(1f)
+                    .fillMaxSize()
             ){
                 val coroutineScope = rememberCoroutineScope()
                 ContactMenuButton(
@@ -90,21 +108,47 @@ fun MainScreen(
                 personList = viewModel?.getPersonsList() ?: emptyList()
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(8.dp)
+            Row(
+                modifier =modifier
+                    .weight(10f)
+                    .fillMaxSize()
             ){
-                items(personList){person ->
-                    var searchValue by remember { mutableStateOf("") }
-                    searchValue = viewModel?.contactsState?.searchValue ?: ""
-                    if(person.person.personFullName!!.contains(searchValue,true)) {
-                        //viewModel?.setCurrentPerson(person.person.personId)
-                        PersonElementDetail(
-                            viewModel=viewModel,
-                            personWithContacts=person
-                        ){
-                            navHostController?.navigate(AppScreens.ContactDetail.route)
+                LazyColumn(
+                    contentPadding=PaddingValues(8.dp)
+                ) {
+                    items(personList) { person ->
+                        var searchValue by remember { mutableStateOf("") }
+                        searchValue=viewModel?.contactsState?.searchValue ?: ""
+                        if (person.person.personFullName!!.contains(searchValue, true)) {
+                            //viewModel?.setCurrentPerson(person.person.personId)
+                            PersonElementDetail(
+                                viewModel=viewModel,
+                                personWithContacts=person
+                            ) {
+                                navHostController?.navigate(AppScreens.ContactDetail.route)
+                            }
                         }
                     }
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .weight(1f)
+                    .fillMaxSize()
+            ) {
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick={ navHostController?.navigate(AppScreens.ContactCreation.route) },
+                    modifier =modifier
+                        .clip(CircleShape)
+                        .size(50.dp)
+                ) {
+                    Icon(painter=painterResource(id=R.drawable.add), contentDescription="")
                 }
             }
         }
@@ -115,7 +159,8 @@ fun MainScreen(
 fun MainScreenPortrait(
     modifier: Modifier = Modifier,
     viewModel: ContactsViewModel? = null,
-    navHostController: NavHostController? = null
+    navHostController: NavHostController? = null,
+    orientation: Int = Configuration.ORIENTATION_PORTRAIT
 ){
     Row(
         modifier = modifier
@@ -123,22 +168,23 @@ fun MainScreenPortrait(
     ){
         Column(
             modifier =modifier
-                .weight(1f)
-                .fillMaxSize()
+                .fillMaxHeight()
+                .fillMaxWidth(0.5f)
         ){
             MainScreen(
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                orientation = orientation
             )
         }
         Column(
             modifier =modifier
-                .weight(1f)
-                .fillMaxSize()
+                .fillMaxHeight()
         ) {
             CalendarViewScreen(
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                orientation = orientation
             )
         }
     }
